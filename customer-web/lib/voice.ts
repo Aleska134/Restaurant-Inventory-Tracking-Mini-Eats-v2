@@ -40,7 +40,30 @@ const FALLBACK: Record<Lang, string> = {
   es: "Perdón, no te entendí. Prueba “dos Margheritas y una Coca-Cola, para llevar”.",
 };
 
-export async function interpret(text: string, lang: Lang): Promise<VoiceResult> {
+export interface VoiceTurn {
+  role: "user" | "assistant";
+  text: string;
+}
+
+/** Earlier turns of this voice conversation, so "order that one" refers to what was suggested. */
+export function cleanHistory(v: unknown): VoiceTurn[] {
+  if (!Array.isArray(v)) return [];
+  const turns = v
+    .filter((t): t is VoiceTurn => !!t && (t.role === "user" || t.role === "assistant") && typeof t.text === "string" && !!t.text.trim())
+    .map((t) => ({ role: t.role, text: t.text.trim().slice(0, 400) }))
+    .slice(-8);
+  // The API needs alternating turns starting with the user.
+  const out: VoiceTurn[] = [];
+  for (const t of turns) {
+    if (!out.length && t.role !== "user") continue;
+    if (out.length && out[out.length - 1].role === t.role) out[out.length - 1] = t;
+    else out.push(t);
+  }
+  if (out.length && out[out.length - 1].role === "user") out.pop();
+  return out;
+}
+
+export async function interpret(text: string, lang: Lang, history: VoiceTurn[] = []): Promise<VoiceResult> {
   const empty: VoiceResult = { intent: "unknown", items: [], fulfillment: null, tableNumber: null, matches: [], reply: FALLBACK[lang] };
   if (!process.env.ANTHROPIC_API_KEY) return empty;
 
@@ -84,10 +107,17 @@ export async function interpret(text: string, lang: Lang): Promise<VoiceResult> 
       "restaurant in matches (closed ones too). If the best match is closed, say it opens at 5 PM and suggest a similar " +
       "orderable dish at the open restaurant, including its id in matches.\n" +
       "- unknown: anything else.\n" +
+      "Earlier turns of the conversation come first; the assistant turns list the dish ids that were shown. When " +
+      "the customer refers back (\"order that\", \"the first one\", \"I'll take it\", \"pídemelo\", \"ese\"), " +
+      "resolve it to those dishes and use add_to_order.\n" +
       "If they ask for something sold out or not on the menu, say so briefly and suggest an alternative. Never invent " +
       "dishes, prices or ids. The reply is shown on screen: one or two short, warm sentences, and for add_to_order " +
       `remind them to review and confirm their order. Reply in ${lang === "es" ? "Spanish" : "English"}.`,
     messages: [
+      ...history.map((t) => ({
+        role: t.role,
+        content: t.role === "user" ? `<customer_said>${t.text}</customer_said>` : t.text,
+      })),
       {
         role: "user",
         content: `<menu>${JSON.stringify(catalog)}</menu>\n<customer_said>${text.slice(0, 300)}</customer_said>`,

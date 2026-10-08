@@ -10,6 +10,32 @@ import { useSpeech } from "./useSpeech";
 
 export const VOICE_ENABLED = process.env.NEXT_PUBLIC_VOICE_ORDERING === "on";
 
+interface Turn {
+  role: "user" | "assistant";
+  text: string;
+}
+
+// Conversation memory for this tab: survives page changes, forgotten after 10 quiet minutes.
+const HISTORY_KEY = "bm_voice_history";
+const HISTORY_TTL_MS = 10 * 60_000;
+
+function loadHistory(): Turn[] {
+  try {
+    const raw = JSON.parse(sessionStorage.getItem(HISTORY_KEY) ?? "null") as { at: number; turns: Turn[] } | null;
+    return raw && Date.now() - raw.at < HISTORY_TTL_MS ? raw.turns : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(turns: Turn[]) {
+  try {
+    sessionStorage.setItem(HISTORY_KEY, JSON.stringify({ at: Date.now(), turns: turns.slice(-8) }));
+  } catch {
+    /* private mode: memory lasts only for this page */
+  }
+}
+
 interface VoiceResult {
   intent: "add_to_order" | "find_dish" | "unknown";
   items: { dishId: string; quantity: number }[];
@@ -46,14 +72,25 @@ export function VoiceAssistant({
     setBusy(true);
     setResult(null);
     try {
+      const history = loadHistory();
       const res = await fetch("/api/voice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, lang }),
+        body: JSON.stringify({ text, lang, history }),
       });
       if (!res.ok) throw new Error();
       const r: VoiceResult = await res.json();
       setResult(r);
+      // Remember what was said and which dishes were shown, by id, for follow-ups like "order that one".
+      const shown = [
+        ...r.items.map((i) => `${i.dishId} x${i.quantity}`),
+        ...r.matches.map((m) => (m.open ? m.dishId : `${m.restaurantId}:${m.dishId}`) + ` (${m.name.en})`),
+      ];
+      saveHistory([
+        ...history,
+        { role: "user", text },
+        { role: "assistant", text: r.reply + (shown.length ? ` [dishes shown: ${shown.join(", ")}]` : "") },
+      ]);
       if (r.intent === "add_to_order" && r.items.length) {
         for (const it of r.items) {
           const d = dishes.find((x) => x.id === it.dishId);
