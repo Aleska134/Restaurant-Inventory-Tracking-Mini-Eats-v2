@@ -1,19 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import type { Localized } from "@/lib/content";
 import type { ViewDish, ViewRestaurant } from "@/lib/types";
 import { useApp } from "./AppProvider";
 import { DemoFooter, Header } from "./Header";
 import { Gate } from "./Gate";
 import { DishImage } from "./ui";
-
-interface ActiveOrder {
-  id: string;
-  order_number: number;
-  status: string;
-}
 
 export function Home({
   restaurants,
@@ -23,23 +16,10 @@ export function Home({
   special: { dish: ViewDish; reason: Localized } | null;
   dishes: ViewDish[];
 }) {
-  const { t, L, price, customer, activeOrderId, setActiveOrderId } = useApp();
-  const [active, setActive] = useState<ActiveOrder | null>(null);
+  const { t, L, price, customer } = useApp();
   const open = restaurants.filter((r) => r.acceptsOrders);
   const closed = restaurants.filter((r) => !r.acceptsOrders);
 
-  useEffect(() => {
-    if (!activeOrderId) return setActive(null);
-    fetch(`/api/orders/${activeOrderId}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((o) => {
-        if (!o || o.status === "COMPLETED" || o.status === "CANCELLED") {
-          setActive(null);
-          if (!o || o.status === "COMPLETED" || o.status === "CANCELLED") setActiveOrderId(null);
-        } else setActive(o);
-      })
-      .catch(() => {});
-  }, [activeOrderId, setActiveOrderId]);
 
   return (
     <Gate>
@@ -48,24 +28,6 @@ export function Home({
         <h1 className="text-3xl font-black text-night">{t("home.hi", { name: customer?.name ?? "" })} 👋</h1>
         <p className="text-ink-soft">{t("home.subtitle")}</p>
 
-        {active && (
-          <Link
-            href={`/order/${active.id}`}
-            className="mt-4 flex items-center justify-between rounded-2xl bg-night px-4 py-3 text-white shadow-card"
-          >
-            <span className="flex items-center gap-2 font-semibold">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-gold" />
-              </span>
-              {t("home.activeOrder", {
-                n: active.order_number,
-                status: t(`order.status.${active.status}` as never).toLowerCase(),
-              })}
-            </span>
-            <span className="font-bold text-gold">{t("home.track")} →</span>
-          </Link>
-        )}
 
         {open.map((r) => (
           <Link

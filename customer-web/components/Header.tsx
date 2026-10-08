@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useApp } from "./AppProvider";
+import { ActiveOrders } from "./ActiveOrders";
 
 export function Logo({ light = false }: { light?: boolean }) {
   return (
@@ -30,6 +31,7 @@ export function LangToggle({ light = false }: { light?: boolean }) {
 export function Header() {
   const { customer, t, setTastesOpen } = useApp();
   return (
+    <>
     <header className="sticky top-0 z-30 border-b border-line/70 bg-cream/90 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" aria-label="BarMade home">
@@ -48,6 +50,8 @@ export function Header() {
         </div>
       </div>
     </header>
+    <ActiveOrders />
+    </>
   );
 }
 
