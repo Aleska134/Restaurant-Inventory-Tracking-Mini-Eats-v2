@@ -161,7 +161,7 @@ Built as a team project at Miami Dade College for BarMade:
   and ongoing maintenance of this repository.
 - **Ricardo Molina**: manager platform (backend API, PostgreSQL, manager dashboard) and the customer ↔ backend sync.
 - **Alonso Bardales**: first BarMade API, the Mini Eats prototype, the iOS apps and the first web demo.
-- …and the rest of the team, who shaped the PRD, the synthetic dataset and the demo.
+- **Jorge Estenger**: BarMade API and backend.
 
 This repository continues the team repo [`Alonbbar6/claude_ai`](https://github.com/Alonbbar6/claude_ai), with its
 full history.
