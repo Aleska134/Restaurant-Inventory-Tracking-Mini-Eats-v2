@@ -13,12 +13,13 @@ import { Gate } from "./Gate";
 import { ForYou } from "./ForYou";
 import { GroupEntry } from "./GroupOrder";
 import { VOICE_ENABLED, VoiceAssistant } from "./VoiceAssistant";
+import { useLiveMenu } from "./useLiveMenu";
 
 export function MenuView({
   restaurant,
-  dishes,
+  dishes: initialDishes,
   categories,
-  special,
+  special: initialSpecial,
   alternatives,
 }: {
   restaurant: ViewRestaurant;
@@ -28,13 +29,24 @@ export function MenuView({
   alternatives?: ViewDish[];
 }) {
   const { t, L, cart, customer, setTastesOpen } = useApp();
+  // Live sync: poll the backend so 86 / reorder / chef-special / Close Day show
+  // without a page refresh. Seeded by the server render (no empty flash).
+  // Browse-only showcase restaurants (acceptsOrders=false in config) never poll.
+  const live = useLiveMenu(
+    { dishes: initialDishes, special: initialSpecial, closed: !restaurant.acceptsOrders },
+    restaurant.acceptsOrders ? 5000 : 1_000_000,
+  );
+  const dishes = restaurant.acceptsOrders ? live.dishes : initialDishes;
+  const special = restaurant.acceptsOrders ? live.special : initialSpecial;
+  // A config-closed showcase restaurant stays closed; an orderable one closes
+  // live when the manager runs Close Day.
+  const canOrder = restaurant.acceptsOrders && !live.closed;
   const [openDish, setOpenDish] = useState<ViewDish | null>(null);
   const [hideConflicts, setHideConflicts] = useState(false);
-  const avoid = useMemo(() => (restaurant.acceptsOrders ? customer?.taste?.avoid ?? [] : []), [restaurant, customer]);
+  const avoid = useMemo(() => (canOrder ? customer?.taste?.avoid ?? [] : []), [canOrder, customer]);
   const conflictCount = dishes.filter((d) => avoidConflicts(d, avoid).length).length;
   const [cartOpen, setCartOpen] = useState(false);
   const [cartPreset, setCartPreset] = useState<CartPreset | null>(null);
-  const canOrder = restaurant.acceptsOrders;
   const specialDish = special ? dishes.find((d) => d.id === special.dishId) : undefined;
   const closeDish = useCallback(() => setOpenDish(null), []);
   const closeCart = useCallback(() => setCartOpen(false), []);

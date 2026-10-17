@@ -4,7 +4,7 @@ import inventoryJson from "@/data/barmade/inventory.json";
 import metadataJson from "@/data/barmade/metadata.json";
 import { CATEGORY_ORDER, MODIFIERS, TRATTORIA_COPY, type Localized, type Taste } from "./content";
 import { store } from "./store";
-import { barmadeMode, liveStock, readLive } from "./barmade";
+import { barmadeMode, liveStock, readLive, getRestaurantStatus } from "./barmade";
 
 // ---- Source data (BarMade synthetic dataset) -------------------------------
 
@@ -106,12 +106,12 @@ export async function loadCatalog(): Promise<Catalog> {
         const l = byId.get(m.id);
         // The backend has no modifiers, so none are offered (keeps price + inventory consistent).
         return l
-          ? { ...m, name: l.name || m.name, price: Number(l.price), ingredients: l.ingredients ?? m.ingredients, modifierIds: [], active: true }
+          ? { ...m, name: l.name || m.name, price: Number(l.price), ingredients: l.ingredients ?? m.ingredients, modifierIds: [], active: l.available !== false }
           : { ...m, modifierIds: [], active: false };
       });
       for (const l of live.menu)
         if (!MENU.some((m) => m.id === l.id))
-          rows.push({ id: l.id, key: l.id, name: l.name, price: Number(l.price), category: l.category ?? "Entree", modifierIds: [], ingredients: l.ingredients ?? [], active: true });
+          rows.push({ id: l.id, key: l.key ?? l.id, name: l.name, price: Number(l.price), category: l.category ?? "Entree", modifierIds: [], ingredients: l.ingredients ?? [], active: l.available !== false });
       const stock = liveStock(live.inventory);
       const plentiful = live.inventory
         .filter((i) => (i.reorderPoint ?? 0) > 0 && rows.some((r) => r.active && r.category !== "Beverage" && r.ingredients.some((x) => x.ingredientId === i.id)))
@@ -186,10 +186,12 @@ export interface Menu {
   dishes: Dish[];
   categories: string[];
   special: ChefSpecial | null;
+  closed?: boolean;
 }
 
 export async function getMenu(): Promise<Menu> {
   const { rows, stock, live, plentiful } = await loadCatalog();
+  const status = live ? await getRestaurantStatus().catch(() => ({ closed: false })) : { closed: false };
   const dishes: Dish[] = rows.map((m) => {
     const copy = TRATTORIA_COPY[m.key];
     const flags = new Set(m.ingredients.flatMap((i) => INGREDIENT_FLAGS[i.ingredientId] ?? []));
@@ -211,7 +213,7 @@ export async function getMenu(): Promise<Menu> {
     };
   });
   const categories = CATEGORY_ORDER.filter((c) => dishes.some((d) => d.category === c));
-  return { dishes, categories, special: chefSpecial(dishes, rows, live ? plentiful ?? null : undefined) };
+  return { dishes, categories, special: chefSpecial(dishes, rows, live ? plentiful ?? null : undefined), closed: !!status.closed };
 }
 
 /**

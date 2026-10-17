@@ -23,8 +23,12 @@ export async function restaurantView(id: string): Promise<
   if (!r) return null;
   if (r.acceptsOrders) {
     const menu = await getMenu();
+    // The manager can close the restaurant (Close Day) — when the backend
+    // reports closed, present it as not accepting orders so the existing
+    // closed banner shows and the cart is hidden.
+    const restaurant = menu.closed ? { ...toViewRestaurant(r), acceptsOrders: false } : toViewRestaurant(r);
     return {
-      restaurant: toViewRestaurant(r),
+      restaurant,
       dishes: menu.dishes,
       categories: menu.categories,
       special: menu.special ? { dishId: menu.special.dishId, reason: menu.special.reason } : null,

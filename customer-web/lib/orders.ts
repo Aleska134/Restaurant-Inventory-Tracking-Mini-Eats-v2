@@ -12,7 +12,7 @@ import {
   type LineInput,
 } from "./catalog";
 import { MODIFIERS, TRATTORIA_ID } from "./content";
-import { barmadeMode } from "./barmade";
+import { barmadeMode, getRestaurantStatus } from "./barmade";
 import { createBarmadeOrder, getBarmadeOrder, listBarmadeOrders } from "./barmade-orders";
 
 export const STATUSES = ["RECEIVED", "PREPARING", "READY", "COMPLETED", "CANCELLED"] as const;
@@ -73,6 +73,11 @@ export interface NewOrder {
 const MAX_QTY = 20;
 
 export async function createOrder(input: NewOrder): Promise<Order> {
+  // Restaurant closed → stop taking orders (manager closed the day).
+  if (barmadeMode()) {
+    const status = await getRestaurantStatus();
+    if (status.closed) throw new OrderError("invalid", "The restaurant is closed and not taking orders right now.");
+  }
   const name = input.customerName.trim().slice(0, 40);
   if (!name) throw new OrderError("invalid", "customerName is required");
   if (input.fulfillment !== "to_go" && input.fulfillment !== "for_here")

@@ -10,10 +10,11 @@ import { useApp } from "./AppProvider";
 import { DemoFooter, Header } from "./Header";
 import { Gate } from "./Gate";
 import { DishImage } from "./ui";
+import { useLiveMenu } from "./useLiveMenu";
 
 export function Home({
   restaurants,
-  special,
+  special: initialSpecial,
   dishes,
 }: {
   restaurants: ViewRestaurant[];
@@ -22,8 +23,25 @@ export function Home({
 }) {
   const { t, L, price, customer } = useApp();
   const router = useRouter();
-  const open = restaurants.filter((r) => r.acceptsOrders);
-  const closed = restaurants.filter((r) => !r.acceptsOrders);
+  // Live sync: an orderable restaurant can be closed by the manager (Close Day)
+  // between renders, and the chef special can change — poll so the home cards
+  // and special update without a refresh.
+  const orderable = restaurants.some((r) => r.acceptsOrders);
+  const live = useLiveMenu(
+    { dishes, special: initialSpecial ? { dishId: initialSpecial.dish.id, reason: initialSpecial.reason } : null, closed: false },
+    orderable ? 5000 : 1_000_000,
+  );
+  // Fold the live closed-state into each orderable restaurant's acceptsOrders.
+  const liveRestaurants = restaurants.map((r) => (r.acceptsOrders && live.closed ? { ...r, acceptsOrders: false } : r));
+  const special =
+    live.special && dishes.length
+      ? (() => {
+          const d = dishes.find((x) => x.id === live.special!.dishId);
+          return d ? { dish: d, reason: live.special!.reason } : null;
+        })()
+      : initialSpecial;
+  const open = liveRestaurants.filter((r) => r.acceptsOrders);
+  const closed = liveRestaurants.filter((r) => !r.acceptsOrders);
 
   return (
     <Gate>
