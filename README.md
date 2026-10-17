@@ -1,216 +1,167 @@
-# BarMade: restaurant ordering & inventory demo
+# BarMade — Restaurant Ordering & Inventory Platform
 
-Classroom prototype for **BarMade**: small restaurants get live, recipe-based inventory, and their customers
-skip the lunch line by ordering ahead from their phone. All restaurant data is **synthetic**.
+A two-sided restaurant platform built for **BarMade**. Small restaurants get **live, recipe-based inventory**
+(every sale deducts ingredients, low-stock and expiry alerts, purchase orders, end-of-day summaries), and their
+customers **skip the lunch line by ordering ahead from their phone**, with to go / for here, live order
+tracking, AI suggestions, **voice ordering** and **group orders with a split bill**.
 
-| Part | Where | What it is |
+All restaurant data is **synthetic**: a fictional Italian restaurant, *Trattoria Little Italy*, with two months
+of history. The app is in English, with a full Spanish toggle on the customer side.
+
+```
+                     ┌──────────────────────────── PostgreSQL (Neon) ───────────────────────┐
+                     │                                                                      │
+ Customer's phone ─► customer-web ──server-side REST──► backend ◄──────────────────── manager-web
+ (QR code)           Next.js 16                         Express + Prisma               React + Vite dashboard
+                     │  ├─ Firestore: profiles, group orders, order details             (restaurant owner)
+                     │  └─ Gemini or Claude: suggestions + voice                 OpenRouter: Close-Day summary
+```
+
+| Part | Folder | What it is |
 |---|---|---|
-| **Customer web app** | [`customer-web/`](customer-web/HANDOFF.md) | The page customers open from a QR code: name-only account, EN/ES, live menu, to go / for here, live order tracking, AI suggestions and voice ordering (Claude or Gemini), group orders with a split bill. Next.js, deployed on Railway. |
-| **BarMade backend** | `https://barmade-riw5.onrender.com` (separate service) | Express + Firestore. Owns the menu, recipes, batch inventory, orders, movements and order status. |
-| Mini Eats prototype | [`app/`](#mini-eats-prototype-python-backend), `static/`, `tests/` | Python/FastAPI backend: predictive ETA, pickup "when to leave", courier dispatch, notifications, merchant menu + inventory. |
-| iOS apps | [`ios/`](ios/README.md) | SwiftUI customer app (MiniEats) and merchant app (MiniEatsMerchant). |
-| Hand-off docs | [`docs/handoff/`](docs/handoff/orders-contract.md) | Contract between the customer app and the BarMade backend. |
+| **Customer web app** | [`customer-web/`](customer-web/HANDOFF.md) | Ordering site customers open from a QR code. Next.js 16 + React 19 + Tailwind. |
+| **Backend API** | [`backend/`](docs/MANAGER-PLATFORM.md) | Single source of truth: menu, recipes, inventory, orders, alerts, vendors, sales. Express + TypeScript + Prisma + PostgreSQL. |
+| **Manager dashboard** | [`manager-web/`](docs/MANAGER-PLATFORM.md) | The restaurant owner's console. React + Vite + Tailwind + Recharts. |
+| Earlier prototypes | `app/`, `web/`, `ios/` | Python ETA/dispatch prototype, first web demo, SwiftUI apps (see [below](#earlier-prototypes)). |
 
 ---
 
-## Customer web app (`customer-web/`)
+## Features
 
-```
-Phone (QR) ─► customer-web (Railway) ──POST /api/orders──► BarMade API (Render) ─► Firestore barmade/state/*
-                      │                                                                  ▲
-                      ├──────────── reads menu, stock, order status (read-only) ──────────┘
-                      └──────────── AI: Claude or Gemini (suggestions + voice, no personal data)
-```
+### For customers (`customer-web/`)
 
-**What a customer can do**
+- **Account with just a name**, remembered on the device. English by default, with a Spanish toggle that also
+  translates dish names and descriptions.
+- **Live menu** from the backend: price, stock, "Only N left" and "Sold out". When the manager 86's a dish or
+  closes the day, the customer side follows within seconds.
+- **Allergen badges** derived from recipe ingredients, plus a saved "avoid" list that flags and sorts away
+  clashing dishes.
+- **Chef's special** picked from what the kitchen has the most of compared with its reorder point.
+- **"Picked for you" suggestions** from taste chips or a free-text craving, written by the AI (Gemini or Claude).
+- **Voice ordering** from the home page or the menu, in English or Spanish:
+  - "two Margheritas and a Coke, to go" fills the cart, shows what was added with **Undo**, and the customer
+    confirms. Voice never orders by itself.
+  - "where can I get sushi?" searches every restaurant, including closed ones, and suggests an open alternative.
+  - "dinner for two under $40, no pork" builds a meal; code enforces budget, stock and allergens.
+  - Follow-ups like "order that one" remember the conversation.
+- **Group orders:** share a 4-letter code, everyone adds their own dishes live, the host picks *each pays their
+  own* or *split equally* (exact cents) and sends **one** order to the kitchen.
+- **🥡 To go or 🍽️ For here** (with table number). Payment happens at the counter or table.
+- **Live tracking** (`RECEIVED → PREPARING → READY → COMPLETED`) and an **open orders bar** on every page that
+  keeps each order visible until the kitchen completes it.
+- **Three browse-only "closed" restaurants** (Cuban, sushi, healthy bowls) with original illustrations, to make
+  the marketplace feel real.
 
-- **Create an account with just a name.** It's stored in Firestore `customers/{id}` and remembered on the device.
-- **Use the app in English (default) or Spanish**, with a toggle that also translates dish names and descriptions.
-- **Browse Trattoria Little Italy.** Price, recipe and stock are read live from the backend. Each dish shows
-  "Only N left" or "Sold out". Dataset dishes the restaurant isn't serving appear as sold out.
-- **See allergen badges** (dairy, gluten, egg, fish, pork) derived from the recipe ingredients, with an "ask staff"
-  note. A saved "avoid" list flags and sorts away clashing dishes.
-- **See a chef's special** picked from what the kitchen has the most of compared with its reorder point (PRD FR-8).
-- **Get "Picked for you" suggestions** from taste chips or a free-text craving ("something light under $15"). The AI
-  (Claude or Gemini) ranks the in-stock, allergy-safe dishes and writes a one-line reason. It never receives the
-  customer's name or id. Without an AI key, a rule-based fallback is used.
-- **Order by voice** from the home page or the menu: "two Margheritas and a Coke, to go", "where can I get sushi?",
-  "dinner for two under $40, no pork". Code validates every dish, quantity, allergen and budget; the bubble shows what
-  was added with Undo, and the customer confirms in the cart. Voice never orders by itself, and follow-ups like
-  "order that one" remember the conversation.
-- **Order as a group:** share a 4-letter code, everyone adds their own dishes live, the host picks "each pays their
-  own" or "split equally" and sends **one** order to the kitchen. Each person sees what they owe (paid at the counter
-  or table; the host can mark who paid).
-- **Choose 🥡 To go (packed) or 🍽️ For here (on a plate)**, with an optional table number. No online payments:
-  "Pay at pickup / at your table".
-- **Track orders live** with an "Ordered via BarMade" badge. An **open orders bar** on every page keeps each order
-  (including group orders) visible until the merchant marks it `COMPLETED` or `CANCELLED`:
-  `RECEIVED → PREPARING → READY → COMPLETED`.
-- **Browse three closed restaurants** (La Ventanita de Calle 8, Brickell Sushi Co., Wynwood Greens). They show a
-  browse-only menu with original illustrations, are always closed in the demo, and suggest similar dishes at the open Trattoria.
+### For the restaurant (`manager-web/` + `backend/`)
 
-**How an order flows**
+- **Dashboard:** today's orders, revenue, alerts, low/out-of-stock, dishes sold, a projection of expected vs.
+  actual sales, and menu readiness (what can still be served). A date picker shows past days.
+- **Inventory:** live stock per ingredient (batch-tracked), servings remaining per dish, overstock, physical
+  counts with confirmation, and the movement history behind every number.
+- **Orders board:** customer orders arrive live and move through *Preparing → Ready → Completed*.
+- **Alerts:** low stock and expiring batches, with one-tap actions: reorder, 86 the dish, substitute an
+  ingredient, or serve without it.
+- **Cart and vendors:** a purchasing cart (add low-stock items, weekly suggestions), vendor comparison, product
+  pricing, and AI-drafted purchase-order emails.
+- **Sales:** by day, by dish and by channel (BarMade vs. Uber Eats / DoorDash fees).
+- **Close / Open day:** a readiness check, then an end-of-day summary written by an LLM from computed facts.
+- **Simulate rush** for live demos.
 
-1. The customer app validates the basket against the live menu and stock.
-2. `POST /api/orders` on the BarMade backend sends `items` plus `channel: "barmade"`, `source: "barmade-web"`,
-   `fulfillment`, `tableNumber`, `customerName` and `customerId`. A group order is merged into one order first.
-3. The backend computes consumption from the recipe, deducts inventory (oldest batch first), records the movement, and
-   creates the order as `RECEIVED` (5% BarMade channel fee).
-4. The merchant moves the order with `PATCH /api/orders/:id/status`. The customer's screen follows within a few seconds.
+### Design rule (from the PRD)
 
-Tested end to end against the real backend. Examples: ORD-004 (a Coca-Cola, for here at table 4): inventory 119 → 118,
-movement `MOV-000002 sale`. Group order ORD-022 (two people, one Coca-Cola each): one order with 2 Coca-Colas,
-$2.99 each, inventory 109 → 107.
+> **Plain code computes every number** (stock, totals, thresholds, servings, budgets, prices).
+> **The AI only picks options and writes language.** It never sees customers' names or ids, and it never
+> invents or changes a figure.
 
-**Run it locally**
+---
+
+## Run it locally
+
+You need **Node 20** (`nvm use 20`) and a PostgreSQL URL (a free [Neon](https://neon.tech) database is easiest).
 
 ```bash
-cd customer-web
-nvm use              # Node 20+
+# 1) Backend: http://localhost:4000
+cd backend
+cp .env.example .env          # set DATABASE_URL (+ OPENROUTER_API_KEY for the Close-Day summary)
 npm install
-cp .env.example .env # BARMADE_API_URL, FIREBASE_SERVICE_ACCOUNT, FIREBASE_PROJECT_ID,
-                     # AI_PROVIDER + GEMINI_API_KEY (or ANTHROPIC_API_KEY), NEXT_PUBLIC_VOICE_ORDERING=on
-npm run dev          # http://localhost:3000
+npx prisma db push            # create the tables
+npm run seed                  # load the synthetic dataset (idempotent)
+npm run dev
+
+# 2) Manager dashboard: http://localhost:5173
+cd manager-web
+npm install
+VITE_API_URL=http://localhost:4000 npm run dev
+
+# 3) Customer app: http://localhost:3000
+cd customer-web
+cp .env.example .env          # BARMADE_API_URL=http://localhost:4000, Firebase, AI_PROVIDER + GEMINI_API_KEY,
+npm install                   # NEXT_PUBLIC_VOICE_ORDERING=on
+npm run dev
 ```
 
-With no backend or Firebase variables, it runs fully offline on the synthetic dataset and an embedded
-database, without touching the team's data. `GET /api/health` shows what's active (storage, backend and AI provider),
-and `npm run smoke -- <url>` checks a deployment (read-only unless `--write`).
+Without `BARMADE_API_URL` and Firebase variables, the customer app also runs **fully offline** on the synthetic
+dataset, which is handy for UI work.
 
-**Deploy:** see [`customer-web/HANDOFF.md`](customer-web/HANDOFF.md) (Railway, root directory `customer-web`).
-**Contract with the backend:** [`docs/handoff/orders-contract.md`](docs/handoff/orders-contract.md).
+## Deploy
 
-**Next up:** the merchant dashboard needs buttons for the status changes (the backend endpoint already exists).
+- **Heroku + Neon on your own accounts:** [`docs/DEPLOY-HEROKU.md`](docs/DEPLOY-HEROKU.md). Step by step for all
+  three apps, plus every external API key the project needs, so it doesn't depend on anyone else's services.
+- **Railway:** [`DEPLOY-RAILWAY.md`](DEPLOY-RAILWAY.md) (how the team demo was deployed).
+- Customer app details (every variable, voice, group orders, demo-day checklist):
+  [`customer-web/HANDOFF.md`](customer-web/HANDOFF.md).
+
+## How the apps talk to each other
+
+The customer app calls the backend **from its server** (never from the browser):
+
+| Call | Purpose |
+|---|---|
+| `GET /api/menu`, `GET /api/inventory` | Live menu and stock (sold out, "only N left") |
+| `GET /api/status` | Restaurant open / closed (closed day = no orders) |
+| `POST /api/orders/precheck` | Dry-run stock check before confirming |
+| `POST /api/orders` | Place an order (`channel: "barmade"`, `source: "barmade-web"`, to go / for here, table, name) |
+| `GET /api/orders/:id` | Order status for live tracking |
+| `PATCH /api/orders/:id/status` | Used by the manager dashboard to move the order forward |
+
+The full contract is in [`SYNC-CONTRACT.md`](SYNC-CONTRACT.md); the first version is in
+[`docs/handoff/orders-contract.md`](docs/handoff/orders-contract.md).
+
+## Repository layout
+
+```
+customer-web/      customer ordering app (Next.js)          → customer-web/HANDOFF.md
+backend/           API + database (Express, Prisma, Postgres) → docs/MANAGER-PLATFORM.md
+manager-web/       restaurant dashboard (React, Vite)
+data/              synthetic dataset for the backend seed
+docs/              DEPLOY-HEROKU.md · MANAGER-PLATFORM.md · MINI-EATS-PROTOTYPE.md · handoff/
+SYNC-CONTRACT.md   customer app ↔ backend contract
+DEPLOY-RAILWAY.md  Railway deployment of the team demo
+app/ static/ tests/ scripts/ datasets/   Mini Eats Python prototype (ETA, dispatch, notifications)
+web/               first manager web demo (Python, read-only on the first BarMade API)
+ios/               SwiftUI customer + merchant apps
+```
+
+## Earlier prototypes
+
+- **Mini Eats (Python / FastAPI):** a delivery prototype with a predictive ETA model using Google Maps travel times,
+  a pickup "when to leave" planner, courier dispatch and an event-driven notification system.
+  See [`docs/MINI-EATS-PROTOTYPE.md`](docs/MINI-EATS-PROTOTYPE.md).
+- **iOS apps (SwiftUI):** a customer app and a merchant app with GPS-based pickup timing, wired to the BarMade
+  backend. See [`ios/README.md`](ios/README.md).
+- **`web/`:** the first manager web demo (Python), built against the first BarMade API on Render.
 
 ---
 
-## Mini Eats prototype (Python backend)
+## Team
 
-A small Uber Eats-style food delivery app built to exercise two things:
+Built as a team project at Miami Dade College for BarMade:
 
-1. **Predictive ETA model** – gradient-boosted models that quote delivery time and a
-   "delay risk" probability, using **Google Maps distance and traffic-aware travel
-   time** as features.
-2. **Notification system** – an event-driven pipeline (status changes, ETA slips,
-   courier dispatch) with per-user channels, quiet hours, dedup, retry and a
-   delivery log, streamed live to the browser over WebSocket.
+- **Aleska Braschi**: customer web app (ordering, EN/ES, voice ordering, group orders, AI suggestions), integration
+  and ongoing maintenance of this repository.
+- **Ricardo Molina**: manager platform (backend API, PostgreSQL, manager dashboard) and the customer ↔ backend sync.
+- **Alonso Bardales**: first BarMade API, the Mini Eats prototype, the iOS apps and the first web demo.
+- …and the rest of the team, who shaped the PRD, the synthetic dataset and the demo.
 
-On top of those, orders are **dispatched by distance**: when the kitchen confirms,
-the app routes every free courier to the restaurant and times their departure so
-they arrive as the food comes out.
-
-### iOS app
-
-A SwiftUI client lives in [`ios/`](ios/README.md): browse, cart, checkout, live order tracking and push-style notifications against this backend.
-
-### Run it
-
-```bash
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt pytest-asyncio
-cp .env.example .env            # optional: add your Google Maps key
-export $(grep -v '^#' .env | xargs)
-.venv/bin/uvicorn app.main:app --reload
-```
-
-Open http://127.0.0.1:8000. Pick a user and a restaurant, add items, and watch the
-order move through the lifecycle (one stage every 4 s) with notifications arriving in
-real time. "Simulate demand spike" re-runs the model and fires a *Running late* alert
-when the ETA slips 5+ minutes.
-
-Without `GOOGLE_MAPS_API_KEY` the app uses a straight-line fallback (haversine × 1.3
-road factor at 19 km/h) and labels it as such in the UI.
-
-Tests: `.venv/bin/pytest`
-
-### How it works
-
-```
-POST /api/orders
-  └─ maps.route(restaurant → customer)      Google Routes API (TRAFFIC_AWARE)
-  └─ predictor.predict(...)                 ETA + delay risk, quoted to the customer
-  └─ bus.publish(order.status_changed)      → NotificationService → push/sms/email/ws
-
-advance → confirmed
-  └─ plan_dispatch()
-       ready_at   = now + kitchen time (prep + items + backlog)
-       for each free courier: maps.route(courier → restaurant)
-       choose courier that lands closest to ready_at (never late if avoidable)
-       dispatch_at = ready_at − courier travel time
-       delivery_at = pickup + customer-leg travel time
-
-advance → preparing / courier_dispatched / picked_up / delivered
-  └─ refresh_eta()  re-predict with live courier load & backlog
-       slip ≥ 5 min → bus.publish(order.delayed) → "Running late" notification
-```
-
-#### Prediction (`app/prediction/`)
-
-| file | role |
-|---|---|
-| `features.py` | single source of truth for the feature vector (distance, Google travel time, prep time, items, hour, weekend, rain, courier load, restaurant backlog, rush hour) |
-| `synthetic.py` | generates training history from a plausible generative process — swap for a real table of delivered orders |
-| `eta.py` | `EtaPredictor`: `GradientBoostingRegressor` (minutes) + `GradientBoostingClassifier` (P(late > 10 min)); trains on first start and caches to `models/eta.pkl`; re-scales to "minutes remaining" per lifecycle stage |
-
-`GET /api/predict/model` reports held-out MAE / AUC and feature importances.
-
-#### Pickup timing (`app/prediction/ready.py`, `app/pickup.py`)
-
-For pickup orders the app tells you **when to leave** so you get there as the food
-comes out: no waiting at the counter, no cold food.
-
-- **Kitchen ready-time model**: three quantile gradient-boosting models give a range
-  for when the food is ready: p50 (most likely), p75 (planned against), p90 (almost
-  surely ready). Inputs: restaurant prep time, items, kitchen backlog, hour/rush/weekend.
-  Calibrated on held-out data (p75 covers ~74% of orders, p90 ~90%). Delivery dispatch
-  uses the same model's p50 to time couriers.
-- **Planner** (pure function): `leave_at = p75 ready time − (travel time + parking/walk-in)`,
-  with travel from the customer's live GPS location by car or on foot (Google Routes API
-  `mode=driving|walking`). It returns `wait` (leave in N min), `leave_now`, `ready`, or
-  `too_far`, plus how long the food would sit (`food_wait_min`) or you would wait.
-- **Live re-planning**: the app sends location as you move (`POST /api/orders/{id}/pickup-plan`),
-  and the server re-plans every 30 s while the kitchen cooks. When it's time, it sends a
-  **"Time to head out"** notification once (deduplicated), even if the app is closed.
-
-#### Routing (`app/maps.py`)
-
-`GoogleMapsProvider` calls the Routes API `computeRouteMatrix` (traffic-aware for driving), caches
-results for 60 s, and falls back to `HaversineProvider` on any error so an outage or
-bad key never blocks orders. Both return a `RouteEstimate(distance_km, duration_min,
-source)`.
-
-#### Notifications (`app/notifications/`)
-
-| file | role |
-|---|---|
-| `events.py` | tiny async event bus (`order.status_changed`, `order.eta_updated`, `order.delayed`) |
-| `templates.py` | message per notification kind; `urgent` ones bypass quiet hours |
-| `channels.py` | `SimulatedChannel` for push/SMS/email (logs, random failures to exercise retry) and a real `WebSocketChannel` |
-| `service.py` | preference-aware dispatch with dedup, quiet-hours deferral + `flush_deferred()`, 3× retry with backoff, delivery log |
-
-### API
-
-| method | path | purpose |
-|---|---|---|
-| GET | `/api/restaurants`, `/api/users`, `/api/couriers` | seed data |
-| PUT | `/api/users/{id}/preferences` | channels & quiet hours |
-| POST | `/api/predict/eta` | quote before ordering (includes the Google route) |
-| POST | `/api/predict/pickup` | pickup quote: ready time range, trip, when to leave |
-| GET | `/api/predict/model` | model metrics & feature importance |
-| POST | `/api/orders` | place an order (routes, quotes, notifies, starts simulation) |
-| GET | `/api/orders?user_id=` · `/api/orders/{id}` | list / detail |
-| GET | `/api/orders/{id}/dispatch` | courier dispatch plan (after confirmation) |
-| POST | `/api/orders/{id}/advance` · `/cancel` · `/refresh-eta?demand_shock=` | drive the lifecycle manually |
-| POST | `/api/orders/{id}/pickup-plan` | re-plan pickup from `{lat, lng, mode}` |
-| POST | `/api/orders/{id}/collect` | pickup: customer has the food |
-| GET | `/api/notifications?user_id=` | notifications with per-channel delivery records |
-| POST | `/api/notifications/flush-deferred` | send what quiet hours held back |
-| WS | `/ws/{user_id}` | live notification stream |
-
-### Next steps
-
-- Replace `synthetic.py` with real delivered-order history (store each order's
-  Google quote alongside the actual delivery time) and retrain on a schedule.
-- Geocode free-text addresses (Google Geocoding API) instead of fixed lat/lng.
-- Real providers for push (FCM/APNs), SMS (Twilio) and email behind the same
-  `BaseChannel` interface.
-- Persist orders/notifications (Postgres) and move the event bus to a queue.
+This repository continues the team repo [`Alonbbar6/claude_ai`](https://github.com/Alonbbar6/claude_ai), with its
+full history.

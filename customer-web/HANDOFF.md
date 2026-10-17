@@ -2,16 +2,19 @@
 
 The customer-facing ordering app (the page people open from the QR code). It is a Next.js 16 app in
 `customer-web/` and runs as **one Railway service** that serves the pages and a small server API (`/api/*`).
+To host everything on your own accounts with Heroku + Neon instead, follow [`docs/DEPLOY-HEROKU.md`](../docs/DEPLOY-HEROKU.md).
 
 ```
-Phone ─► customer-web (Railway) ──POST /api/orders──► BarMade API (Render) ─► Firestore barmade/state/*
+Phone ─► customer-web ──POST /api/orders──► BarMade backend (backend/, Express + Prisma) ─► PostgreSQL
                  │                                                               ▲
                  ├────────── reads menu, stock, order status (read-only) ─────────┘
                  └────────── AI: Claude or Gemini (suggestions + voice; no customer personal data)
 ```
 
-Orders, inventory, movements and order status belong to the **BarMade backend** (`https://barmade-riw5.onrender.com`).
-The customer app never writes to `barmade/state/*`. In Firestore it only writes its own collections:
+Menu, inventory, orders, movements and order status belong to the **BarMade backend** in [`backend/`](../backend)
+(team demo: `https://claudeai-production-0dcc.up.railway.app`; self-hosting: [`docs/DEPLOY-HEROKU.md`](../docs/DEPLOY-HEROKU.md)).
+The customer app reads and writes those only through the backend's REST API ([`SYNC-CONTRACT.md`](../SYNC-CONTRACT.md)).
+In Firestore it only keeps its own collections:
 `customers` (name-only profiles), `customer_app_orders` (to go / for here, table, name per order) and
 `group_orders` (group sessions).
 
@@ -28,8 +31,8 @@ The customer app never writes to `barmade/state/*`. In Firestore it only writes 
 
 | Variable | Required | Value |
 |---|---|---|
-| `BARMADE_API_URL` | **Yes** | `https://barmade-riw5.onrender.com` |
-| `FIREBASE_SERVICE_ACCOUNT` | **Yes** | The Firebase service-account JSON **in base64, on one line** (the same value as in Aleska's `customer-web/.env`). Used to read the menu, stock and order status live, and to store customer profiles and group orders. |
+| `BARMADE_API_URL` | **Yes** | The backend's URL, e.g. `https://claudeai-production-0dcc.up.railway.app` or your Heroku backend. |
+| `FIREBASE_SERVICE_ACCOUNT` | **Yes** | The Firebase service-account JSON **in base64, on one line** (the same value as in Aleska's `customer-web/.env`). Stores customer profiles, group orders and per-order details (to go / for here, table, name). Use your own Firebase project when self-hosting. |
 | `FIREBASE_PROJECT_ID` | Yes | `barmade1-7be2b` |
 | `NEXT_PUBLIC_VOICE_ORDERING` | For voice | `on` shows the 🎤 voice button on the home page and the Trattoria menu (Chrome / Safari). Read at **build** time, so redeploy after changing it. Off by default. |
 | `AI_PROVIDER` | No | `claude` (default) or `gemini`. Picks the AI for "Picked for you" suggestions and voice. If only one key is set, that provider is used automatically. |
@@ -96,8 +99,8 @@ Firestore `group_orders/{code}`, and expire after 6 hours.
 - **Firestore:** the team moved the Firebase project off the free tier, which had hit its ~50k reads/day limit once.
   The customer app also caches live reads for 15 s, serves the last good copy on errors, and pauses backend calls
   for 60 s after a failure.
-- **Wake Render up ~2 minutes before presenting**: open `https://barmade-riw5.onrender.com/api/menu`. On the
-  free tier the first request after a nap takes ~50 s. The customer app also pings it every few minutes while
+- **Wake the backend up ~2 minutes before presenting**: open `<BARMADE_API_URL>/api/menu`. Sleeping hosts
+  (Heroku Eco dynos, Render free tier) take 10–50 s to answer the first request after a nap. The customer app also pings it every few minutes while
   someone is browsing.
 - Open the Railway URL on a real phone: enter a name, add a dish, then check that the order shows up on the merchant side.
 - The merchant moves orders with `PATCH /api/orders/:id/status` (`RECEIVED → PREPARING → READY → COMPLETED`, or
@@ -141,7 +144,7 @@ customer-web/
 │   ├── voice.ts            voice intents: add to order, find a dish, build a meal (validated by code)
 │   ├── recommend.ts        "Picked for you" suggestions (no customer personal data sent)
 │   ├── groups.ts           group sessions, split bill, one kitchen order
-│   ├── barmade.ts          BarMade API client + live menu/inventory (Firestore read-only)
+│   ├── barmade.ts          BarMade API client: live menu/inventory, open/closed status, order precheck
 │   ├── barmade-orders.ts   orders through the BarMade API, status mapping
 │   ├── catalog.ts          menu, recipes, allergens, stock, chef's special
 │   ├── orders.ts           validation, then BarMade API (or local store when offline)
