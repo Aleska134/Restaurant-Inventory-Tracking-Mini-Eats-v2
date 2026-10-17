@@ -1,0 +1,249 @@
+// Barmade manager-side data model.
+// Mirrors the synthetic dataset shape so the seed loads 1:1, and gives the
+// manager dashboard everything it needs: sales, recipe-based depletion, alerts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Ingredient {
+  id           String   @id // ING-001
+  name         String
+  category     String
+  unit         String
+  reorderPoint Float
+  kind         String   @default("purchased") // purchased | prep
+  supplier     String?
+  packSize     Float?
+  packLabel    String?
+  shelfLifeDays Int?
+  targetDays   Int?
+  key          String?
+
+  batches   Batch[]
+  movements Movement[]
+  recipeLines RecipeLine[]
+  alerts    Alert[]
+
+  @@index([category])
+}
+
+model Batch {
+  batchId      String   @id
+  ingredientId String
+  quantity     Float
+  arrivedAt    DateTime
+  expiresAt    DateTime?
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@index([ingredientId])
+}
+
+model MenuItem {
+  id          String   @id // MENU-001
+  key         String   @unique // pizza_margherita (canonical item_id)
+  name        String
+  category    String
+  price       Float
+  modifierIds String[] @default([])
+  available   Boolean  @default(true) // false = 86'd / sold out; customer app must honor
+
+  recipeLines RecipeLine[]
+  orderItems  OrderItem[]
+
+  @@index([category])
+}
+
+model RecipeLine {
+  id           String @id @default(cuid())
+  menuItemId   String
+  ingredientId String
+  quantity     Float
+  essential    Boolean @default(true) // false = secondary/garnish; dish can be served without / substituted
+  menuItem     MenuItem   @relation(fields: [menuItemId], references: [id])
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@unique([menuItemId, ingredientId])
+}
+
+// Reorder shopping cart: Reorder adds a line here; placing the cart books the
+// restock deliveries. One pending line per ingredient.
+model ShoppingCartItem {
+  id            String   @id @default(cuid())
+  ingredientId  String   @unique
+  ingredientName String
+  quantity      Float
+  unit          String
+  status        String   @default("pending") // pending | ordered
+  addedAt       DateTime @default(now())
+  sourceAlertId String?
+}
+
+// Single-row system state: the current business day cursor (advanced by Close Day).
+model SystemState {
+  id              String   @id @default("singleton")
+  currentDay      String   // YYYY-MM-DD venue-local business day
+  closed          Boolean  @default(false) // true = restaurant closed; customer app stops taking orders
+  updatedAt       DateTime @default(now())
+}
+
+// Suppliers the manager can order from.
+model Vendor {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  notes     String?
+  // Drives the AI voice of the purchase-order email:
+  // local = warm/personal, regional = professional-friendly, corporate = formal/procurement.
+  relationship String @default("regional") // local | regional | corporate
+  createdAt DateTime @default(now())
+  products  VendorProduct[]
+  orders    PurchaseOrder[]
+}
+
+// What a vendor sells: an ingredient at a price per PACKAGE.
+model VendorProduct {
+  id            String  @id @default(cuid())
+  vendorId      String
+  ingredientId  String
+  ingredientName String
+  pricePerPack  Float   // price for one purchase package
+  packLabel     String?
+  vendor        Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([vendorId, ingredientId])
+  @@index([ingredientId])
+}
+
+// A purchase order sent to a vendor. Lifecycle: draft -> sent -> received.
+model PurchaseOrder {
+  id          String   @id @default(cuid())
+  vendorId    String
+  vendorName  String
+  status      String   @default("sent") // draft | sent | received | cancelled
+  total       Float    @default(0)
+  emailTo     String?
+  emailSubject String?
+  emailBody   String?
+  createdAt   DateTime @default(now())
+  receivedAt  DateTime?
+  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  items       PurchaseOrderItem[]
+
+  @@index([status])
+}
+
+model PurchaseOrderItem {
+  id              String  @id @default(cuid())
+  purchaseOrderId String
+  ingredientId    String
+  ingredientName  String
+  packs           Float   // number of packages ordered
+  packSize        Float   // base units per package
+  unit            String
+  pricePerPack    Float
+  lineTotal       Float
+  order           PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id            String   @id // ORD-00001
+  status        String   @default("COMPLETED") // RECEIVED|PREPARING|READY|COMPLETED|CANCELLED (customer orders start RECEIVED)
+  channel       String   // dine_in | takeout | website | uber_eats | doordash | barmade
+  placedAt      DateTime
+  businessDate  String   // YYYY-MM-DD (venue-local business day)
+  total         Float
+  grossTotal    Float
+  channelFeeRate Float   @default(0)
+  channelFee    Float    @default(0)
+  netTotal      Float
+  // Customer-app fields (BarMade customer-web contract)
+  source        String?
+  fulfillment   String?
+  tableNumber   String?
+  customerName  String?
+  customerId    String?
+  updatedAt     DateTime?
+  statusHistory Json?
+  items         OrderItem[]
+
+  @@index([businessDate])
+  @@index([channel])
+  @@index([placedAt])
+  @@index([status])
+}
+
+model OrderItem {
+  id         String @id @default(cuid())
+  orderId    String
+  menuItemId String
+  itemKey    String   // canonical key, denormalized for fast grouping
+  name       String
+  quantity   Int
+  unitPrice  Float
+  lineTotal  Float
+  modifiers  String[] @default([])
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@index([orderId])
+  @@index([itemKey])
+}
+
+model Movement {
+  id           String   @id // MOV-000001
+  ingredientId String
+  ingredientName String
+  change       Float    // signed: negative = consumed, positive = delivery/count
+  unit         String
+  reason       String   // sale | delivery | manual_count | waste | spoilage | prep_usage | prep_production
+  orderId      String?
+  batchId      String?
+  timestamp    DateTime
+  businessDate String
+  balanceAfter Float?
+  note         String?
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@index([ingredientId])
+  @@index([businessDate])
+  @@index([reason])
+}
+
+model Alert {
+  id              String   @id // ALERT-001
+  type            String   // LOW_STOCK | OVERSTOCK | EXPIRY | ...
+  status          String   // ACTIVE | RESOLVED
+  severity        String   // critical | high | medium | low
+  ingredientId    String
+  ingredientName  String
+  currentQuantity Float?
+  reorderPoint    Float?
+  unit            String?
+  message         String
+  resolution      String?
+  note            String?  // free-form key, e.g. batchId for EXPIRY alerts
+  createdAt       DateTime
+  updatedAt       DateTime?
+  resolvedAt      DateTime?
+  ingredient      Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@index([status])
+  @@index([type])
+}
+
+// Cached end-of-day AI summaries (one per business date). The payload of
+// computed facts is stored alongside so a summary is always auditable.
+model DailySummary {
+  businessDate String   @id
+  summaryText  String
+  facts        Json
+  model        String?
+  createdAt    DateTime @default(now())
+}

@@ -1,0 +1,989 @@
+[
+  {
+    "id": "ING-001",
+    "name": "Tomato Sauce",
+    "category": "Sauces",
+    "unit": "ml",
+    "reorderPoint": 8000,
+    "batchPrefix": "TS",
+    "key": "tomato_sauce",
+    "kind": "purchased",
+    "supplier": "Sysco",
+    "packSize": 12000,
+    "packLabel": "4 x #10 cans",
+    "deliveryDays": [
+      2
+    ],
+    "shelfLifeDays": 120,
+    "targetDays": 7,
+    "batches": [
+      {
+        "batchId": "TS-010",
+        "quantity": 515939,
+        "arrivedAt": "2026-10-06T13:00:00.000Z",
+        "expiresAt": "2027-02-04T04:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-002",
+    "name": "Mozzarella Cheese",
+    "category": "Dairy",
+    "unit": "g",
+    "reorderPoint": 8000,
+    "batchPrefix": "MZ",
+    "key": "mozzarella",
+    "kind": "purchased",
+    "supplier": "Bella Dairy",
+    "packSize": 2500,
+    "packLabel": "2.5 kg block",
+    "deliveryDays": [
+      1,
+      3,
+      5
+    ],
+    "shelfLifeDays": 12,
+    "targetDays": 3,
+    "batches": [
+      {
+        "batchId": "MZ-026",
+        "quantity": 1881,
+        "arrivedAt": "2026-10-05T11:15:00.000Z",
+        "expiresAt": "2026-10-18T03:59:59.000Z"
+      },
+      {
+        "batchId": "MZ-027",
+        "quantity": 7500,
+        "arrivedAt": "2026-10-07T11:15:00.000Z",
+        "expiresAt": "2026-10-20T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-003",
+    "name": "Pizza Dough",
+    "category": "Dough & Pasta",
+    "unit": "units",
+    "reorderPoint": 25,
+    "batchPrefix": "PD",
+    "key": "pizza_dough",
+    "kind": "prep",
+    "packSize": 1,
+    "packLabel": "dough ball",
+    "deliveryDays": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "shelfLifeDays": 3,
+    "targetDays": 1.5,
+    "prepRecipe": {
+      "yield": 40,
+      "inputs": [
+        {
+          "ingredientId": "ING-013",
+          "quantity": 10000
+        },
+        {
+          "ingredientId": "ING-008",
+          "quantity": 200
+        }
+      ]
+    },
+    "batches": [
+      {
+        "batchId": "PD-060",
+        "quantity": 9,
+        "arrivedAt": "2026-10-06T14:00:00.000Z",
+        "expiresAt": "2026-10-10T03:59:59.000Z"
+      },
+      {
+        "batchId": "PD-061",
+        "quantity": 80,
+        "arrivedAt": "2026-10-07T14:00:00.000Z",
+        "expiresAt": "2026-10-11T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-004",
+    "name": "Pepperoni",
+    "category": "Meats",
+    "unit": "slices",
+    "reorderPoint": 500,
+    "batchPrefix": "PP",
+    "key": "pepperoni",
+    "kind": "purchased",
+    "supplier": "Sysco",
+    "packSize": 1000,
+    "packLabel": "1,000-slice case",
+    "deliveryDays": [
+      2
+    ],
+    "shelfLifeDays": 30,
+    "targetDays": 7,
+    "batches": [
+      {
+        "batchId": "PP-010",
+        "quantity": 8859,
+        "arrivedAt": "2026-10-06T13:00:00.000Z",
+        "expiresAt": "2026-11-06T04:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-005",
+    "name": "Pasta (Spaghetti)",
+    "category": "Dough & Pasta",
+    "unit": "g",
+    "reorderPoint": 5000,
+    "batchPrefix": "PA",
+    "key": "spaghetti",
+    "kind": "purchased",
+    "supplier": "Sysco",
+    "packSize": 10000,
+    "packLabel": "10 kg case",
+    "deliveryDays": [
+      2
+    ],
+    "shelfLifeDays": 365,
+    "targetDays": 7,
+    "batches": [
+      {
+        "batchId": "PA-010",
+        "quantity": 95544,
+        "arrivedAt": "2026-10-06T13:00:00.000Z",
+        "expiresAt": "2027-10-07T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-006",
+    "name": "Alfredo Sauce",
+    "category": "Sauces",
+    "unit": "ml",
+    "reorderPoint": 2000,
+    "batchPrefix": "AS",
+    "key": "alfredo_sauce",
+    "kind": "prep",
+    "packSize": 1,
+    "packLabel": "ml",
+    "deliveryDays": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "shelfLifeDays": 4,
+    "targetDays": 1.5,
+    "prepRecipe": {
+      "yield": 6000,
+      "inputs": [
+        {
+          "ingredientId": "ING-014",
+          "quantity": 4500
+        },
+        {
+          "ingredientId": "ING-015",
+          "quantity": 600
+        },
+        {
+          "ingredientId": "ING-007",
+          "quantity": 900
+        },
+        {
+          "ingredientId": "ING-010",
+          "quantity": 60
+        }
+      ]
+    },
+    "batches": [
+      {
+        "batchId": "AS-049",
+        "quantity": 405,
+        "arrivedAt": "2026-10-05T14:00:00.000Z",
+        "expiresAt": "2026-10-10T03:59:59.000Z"
+      },
+      {
+        "batchId": "AS-050",
+        "quantity": 6000,
+        "arrivedAt": "2026-10-07T14:00:00.000Z",
+        "expiresAt": "2026-10-12T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-007",
+    "name": "Parmesan Cheese",
+    "category": "Dairy",
+    "unit": "g",
+    "reorderPoint": 2000,
+    "batchPrefix": "PM",
+    "key": "parmesan",
+    "kind": "purchased",
+    "supplier": "Bella Dairy",
+    "packSize": 2000,
+    "packLabel": "2 kg wedge",
+    "deliveryDays": [
+      1,
+      5
+    ],
+    "shelfLifeDays": 45,
+    "targetDays": 5,
+    "batches": [
+      {
+        "batchId": "PM-018",
+        "quantity": 6975,
+        "arrivedAt": "2026-10-05T11:15:00.000Z",
+        "expiresAt": "2026-11-20T04:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-008",
+    "name": "Olive Oil",
+    "category": "Oils",
+    "unit": "ml",
+    "reorderPoint": 2000,
+    "batchPrefix": "OO",
+    "key": "olive_oil",
+    "kind": "purchased",
+    "supplier": "Sysco",
+    "packSize": 3000,
+    "packLabel": "3 L tin",
+    "deliveryDays": [
+      2
+    ],
+    "shelfLifeDays": 365,
+    "targetDays": 9,
+    "batches": [
+      {
+        "batchId": "OO-010",
+        "quantity": 2323,
+        "arrivedAt": "2026-09-29T13:00:00.000Z",
+        "expiresAt": "2027-09-30T03:59:59.000Z"
+      },
+      {
+        "batchId": "OO-011",
+        "quantity": 9000,
+        "arrivedAt": "2026-10-06T13:00:00.000Z",
+        "expiresAt": "2027-10-07T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-009",
+    "name": "Chicken",
+    "category": "Meats",
+    "unit": "g",
+    "reorderPoint": 5000,
+    "batchPrefix": "CH",
+    "key": "chicken",
+    "kind": "purchased",
+    "supplier": "Coastal Meats",
+    "packSize": 2000,
+    "packLabel": "2 kg pack",
+    "deliveryDays": [
+      1,
+      3,
+      5
+    ],
+    "shelfLifeDays": 5,
+    "targetDays": 3,
+    "batches": [
+      {
+        "batchId": "CH-026",
+        "quantity": 1665,
+        "arrivedAt": "2026-10-05T12:10:00.000Z",
+        "expiresAt": "2026-10-11T03:59:59.000Z"
+      },
+      {
+        "batchId": "CH-027",
+        "quantity": 18000,
+        "arrivedAt": "2026-10-07T12:10:00.000Z",
+        "expiresAt": "2026-10-13T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-010",
+    "name": "Garlic",
+    "category": "Produce",
+    "unit": "g",
+    "reorderPoint": 400,
+    "batchPrefix": "GA",
+    "key": "garlic",
+    "kind": "purchased",
+    "supplier": "Green Valley Produce",
+    "packSize": 500,
+    "packLabel": "500 g bag",
+    "deliveryDays": [
+      1,
+      4
+    ],
+    "shelfLifeDays": 21,
+    "targetDays": 5,
+    "batches": [
+      {
+        "batchId": "GA-018",
+        "quantity": 808,
+        "arrivedAt": "2026-10-05T11:40:00.000Z",
+        "expiresAt": "2026-10-27T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-011",
+    "name": "Basil",
+    "category": "Produce",
+    "unit": "g",
+    "reorderPoint": 250,
+    "batchPrefix": "BA",
+    "key": "basil",
+    "kind": "purchased",
+    "supplier": "Green Valley Produce",
+    "packSize": 250,
+    "packLabel": "250 g bunch case",
+    "deliveryDays": [
+      1,
+      3,
+      5
+    ],
+    "shelfLifeDays": 6,
+    "targetDays": 3,
+    "batches": [
+      {
+        "batchId": "BA-026",
+        "quantity": 227,
+        "arrivedAt": "2026-10-05T11:40:00.000Z",
+        "expiresAt": "2026-10-12T03:59:59.000Z"
+      },
+      {
+        "batchId": "BA-027",
+        "quantity": 750,
+        "arrivedAt": "2026-10-07T11:40:00.000Z",
+        "expiresAt": "2026-10-14T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-012",
+    "name": "Coca-Cola Cans",
+    "category": "Beverages",
+    "unit": "cans",
+    "reorderPoint": 48,
+    "batchPrefix": "CC",
+    "key": "coca_cola",
+    "kind": "purchased",
+    "supplier": "Coca-Cola Bottling",
+    "packSize": 24,
+    "packLabel": "24-can case",
+    "deliveryDays": [
+      4
+    ],
+    "shelfLifeDays": 270,
+    "targetDays": 9,
+    "batches": [
+      {
+        "batchId": "CC-009",
+        "quantity": 119,
+        "arrivedAt": "2026-10-01T13:30:00.000Z",
+        "expiresAt": "2027-06-29T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-013",
+    "key": "flour",
+    "name": "Flour (00)",
+    "category": "Dry Goods",
+    "unit": "g",
+    "reorderPoint": 10000,
+    "batchPrefix": "FL",
+    "kind": "purchased",
+    "supplier": "Sysco",
+    "packSize": 22680,
+    "packLabel": "50 lb sack",
+    "deliveryDays": [
+      2
+    ],
+    "shelfLifeDays": 180,
+    "targetDays": 8,
+    "batches": [
+      {
+        "batchId": "FL-009",
+        "quantity": 3135,
+        "arrivedAt": "2026-09-29T13:00:00.000Z",
+        "expiresAt": "2027-03-29T03:59:59.000Z"
+      },
+      {
+        "batchId": "FL-010",
+        "quantity": 181440,
+        "arrivedAt": "2026-10-06T13:00:00.000Z",
+        "expiresAt": "2027-04-05T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-014",
+    "key": "heavy_cream",
+    "name": "Heavy Cream",
+    "category": "Dairy",
+    "unit": "ml",
+    "reorderPoint": 3000,
+    "batchPrefix": "HC",
+    "kind": "purchased",
+    "supplier": "Bella Dairy",
+    "packSize": 1890,
+    "packLabel": "half gallon",
+    "deliveryDays": [
+      1,
+      4
+    ],
+    "shelfLifeDays": 10,
+    "targetDays": 4,
+    "batches": [
+      {
+        "batchId": "HC-018",
+        "quantity": 5281,
+        "arrivedAt": "2026-10-05T11:15:00.000Z",
+        "expiresAt": "2026-10-16T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-015",
+    "key": "butter",
+    "name": "Butter",
+    "category": "Dairy",
+    "unit": "g",
+    "reorderPoint": 1000,
+    "batchPrefix": "BU",
+    "kind": "purchased",
+    "supplier": "Bella Dairy",
+    "packSize": 1814,
+    "packLabel": "4 lb case",
+    "deliveryDays": [
+      1,
+      4
+    ],
+    "shelfLifeDays": 60,
+    "targetDays": 5,
+    "batches": [
+      {
+        "batchId": "BU-017",
+        "quantity": 144,
+        "arrivedAt": "2026-10-01T11:15:00.000Z",
+        "expiresAt": "2026-12-01T04:59:59.000Z"
+      },
+      {
+        "batchId": "BU-018",
+        "quantity": 1814,
+        "arrivedAt": "2026-10-05T11:15:00.000Z",
+        "expiresAt": "2026-12-05T04:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-016",
+    "key": "ground_beef",
+    "name": "Ground Beef",
+    "category": "Meats",
+    "unit": "g",
+    "reorderPoint": 3000,
+    "batchPrefix": "GB",
+    "kind": "purchased",
+    "supplier": "Coastal Meats",
+    "packSize": 2268,
+    "packLabel": "5 lb chub",
+    "deliveryDays": [
+      2,
+      5
+    ],
+    "shelfLifeDays": 5,
+    "targetDays": 4,
+    "batches": [
+      {
+        "batchId": "GB-017",
+        "quantity": 1356,
+        "arrivedAt": "2026-10-02T12:10:00.000Z",
+        "expiresAt": "2026-10-08T03:59:59.000Z"
+      },
+      {
+        "batchId": "GB-018",
+        "quantity": 11340,
+        "arrivedAt": "2026-10-06T12:10:00.000Z",
+        "expiresAt": "2026-10-12T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-017",
+    "key": "eggs",
+    "name": "Eggs",
+    "category": "Dairy",
+    "unit": "units",
+    "reorderPoint": 40,
+    "batchPrefix": "EG",
+    "kind": "purchased",
+    "supplier": "Bella Dairy",
+    "packSize": 30,
+    "packLabel": "30-egg flat",
+    "deliveryDays": [
+      1,
+      4
+    ],
+    "shelfLifeDays": 28,
+    "targetDays": 5,
+    "batches": [
+      {
+        "batchId": "EG-018",
+        "quantity": 97,
+        "arrivedAt": "2026-10-05T11:15:00.000Z",
+        "expiresAt": "2026-11-03T04:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-018",
+    "key": "breadcrumbs",
+    "name": "Breadcrumbs",
+    "category": "Dry Goods",
+    "unit": "g",
+    "reorderPoint": 1000,
+    "batchPrefix": "BC",
+    "kind": "purchased",
+    "supplier": "Sysco",
+    "packSize": 2268,
+    "packLabel": "5 lb bag",
+    "deliveryDays": [
+      2
+    ],
+    "shelfLifeDays": 120,
+    "targetDays": 8,
+    "batches": [
+      {
+        "batchId": "BC-009",
+        "quantity": 661,
+        "arrivedAt": "2026-09-29T13:00:00.000Z",
+        "expiresAt": "2027-01-28T04:59:59.000Z"
+      },
+      {
+        "batchId": "BC-010",
+        "quantity": 11340,
+        "arrivedAt": "2026-10-06T13:00:00.000Z",
+        "expiresAt": "2027-02-04T04:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-019",
+    "key": "meatballs",
+    "name": "Meatballs",
+    "category": "Prep",
+    "unit": "units",
+    "reorderPoint": 30,
+    "batchPrefix": "MB",
+    "kind": "prep",
+    "packSize": 1,
+    "packLabel": "meatball",
+    "deliveryDays": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "shelfLifeDays": 4,
+    "targetDays": 1.5,
+    "prepRecipe": {
+      "yield": 60,
+      "inputs": [
+        {
+          "ingredientId": "ING-016",
+          "quantity": 3000
+        },
+        {
+          "ingredientId": "ING-017",
+          "quantity": 4
+        },
+        {
+          "ingredientId": "ING-018",
+          "quantity": 300
+        },
+        {
+          "ingredientId": "ING-007",
+          "quantity": 200
+        },
+        {
+          "ingredientId": "ING-010",
+          "quantity": 40
+        }
+      ]
+    },
+    "batches": [
+      {
+        "batchId": "MB-057",
+        "quantity": 33,
+        "arrivedAt": "2026-10-06T14:00:00.000Z",
+        "expiresAt": "2026-10-11T03:59:59.000Z"
+      },
+      {
+        "batchId": "MB-058",
+        "quantity": 60,
+        "arrivedAt": "2026-10-07T14:00:00.000Z",
+        "expiresAt": "2026-10-12T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-020",
+    "key": "lasagna_sheets",
+    "name": "Lasagna Sheets",
+    "category": "Dough & Pasta",
+    "unit": "g",
+    "reorderPoint": 2000,
+    "batchPrefix": "LS",
+    "kind": "purchased",
+    "supplier": "Sysco",
+    "packSize": 5000,
+    "packLabel": "5 kg case",
+    "deliveryDays": [
+      2
+    ],
+    "shelfLifeDays": 365,
+    "targetDays": 8,
+    "batches": [
+      {
+        "batchId": "LS-009",
+        "quantity": 5280,
+        "arrivedAt": "2026-09-29T13:00:00.000Z",
+        "expiresAt": "2027-09-30T03:59:59.000Z"
+      },
+      {
+        "batchId": "LS-010",
+        "quantity": 15000,
+        "arrivedAt": "2026-10-06T13:00:00.000Z",
+        "expiresAt": "2027-10-07T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-021",
+    "key": "ricotta",
+    "name": "Ricotta",
+    "category": "Dairy",
+    "unit": "g",
+    "reorderPoint": 1500,
+    "batchPrefix": "RI",
+    "kind": "purchased",
+    "supplier": "Bella Dairy",
+    "packSize": 1360,
+    "packLabel": "3 lb tub",
+    "deliveryDays": [
+      1,
+      5
+    ],
+    "shelfLifeDays": 12,
+    "targetDays": 5,
+    "batches": [
+      {
+        "batchId": "RI-018",
+        "quantity": 5208,
+        "arrivedAt": "2026-10-05T11:15:00.000Z",
+        "expiresAt": "2026-10-18T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-022",
+    "key": "romaine",
+    "name": "Romaine Lettuce",
+    "category": "Produce",
+    "unit": "g",
+    "reorderPoint": 2500,
+    "batchPrefix": "RO",
+    "kind": "purchased",
+    "supplier": "Green Valley Produce",
+    "packSize": 2000,
+    "packLabel": "2 kg case",
+    "deliveryDays": [
+      1,
+      3,
+      5
+    ],
+    "shelfLifeDays": 6,
+    "targetDays": 3,
+    "batches": [
+      {
+        "batchId": "RO-026",
+        "quantity": 2263,
+        "arrivedAt": "2026-10-05T11:40:00.000Z",
+        "expiresAt": "2026-10-12T03:59:59.000Z"
+      },
+      {
+        "batchId": "RO-027",
+        "quantity": 6000,
+        "arrivedAt": "2026-10-07T11:40:00.000Z",
+        "expiresAt": "2026-10-14T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-023",
+    "key": "caesar_dressing",
+    "name": "Caesar Dressing",
+    "category": "Sauces",
+    "unit": "ml",
+    "reorderPoint": 1000,
+    "batchPrefix": "CD",
+    "kind": "purchased",
+    "supplier": "Sysco",
+    "packSize": 3780,
+    "packLabel": "1 gal jug",
+    "deliveryDays": [
+      2
+    ],
+    "shelfLifeDays": 45,
+    "targetDays": 9,
+    "batches": [
+      {
+        "batchId": "CD-009",
+        "quantity": 870,
+        "arrivedAt": "2026-09-29T13:00:00.000Z",
+        "expiresAt": "2026-11-14T04:59:59.000Z"
+      },
+      {
+        "batchId": "CD-010",
+        "quantity": 11340,
+        "arrivedAt": "2026-10-06T13:00:00.000Z",
+        "expiresAt": "2026-11-21T04:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-024",
+    "key": "pancetta",
+    "name": "Pancetta",
+    "category": "Meats",
+    "unit": "g",
+    "reorderPoint": 800,
+    "batchPrefix": "PC",
+    "kind": "purchased",
+    "supplier": "Coastal Meats",
+    "packSize": 1000,
+    "packLabel": "1 kg pack",
+    "deliveryDays": [
+      2,
+      5
+    ],
+    "shelfLifeDays": 21,
+    "targetDays": 5,
+    "batches": [
+      {
+        "batchId": "PC-017",
+        "quantity": 515,
+        "arrivedAt": "2026-10-02T12:10:00.000Z",
+        "expiresAt": "2026-10-24T03:59:59.000Z"
+      },
+      {
+        "batchId": "PC-018",
+        "quantity": 2000,
+        "arrivedAt": "2026-10-06T12:10:00.000Z",
+        "expiresAt": "2026-10-28T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-025",
+    "key": "penne",
+    "name": "Pasta (Penne)",
+    "category": "Dough & Pasta",
+    "unit": "g",
+    "reorderPoint": 2000,
+    "batchPrefix": "PE",
+    "kind": "purchased",
+    "supplier": "Sysco",
+    "packSize": 10000,
+    "packLabel": "10 kg case",
+    "deliveryDays": [
+      2
+    ],
+    "shelfLifeDays": 365,
+    "targetDays": 10,
+    "batches": [
+      {
+        "batchId": "PE-009",
+        "quantity": 7350,
+        "arrivedAt": "2026-09-29T13:00:00.000Z",
+        "expiresAt": "2027-09-30T03:59:59.000Z"
+      },
+      {
+        "batchId": "PE-010",
+        "quantity": 10000,
+        "arrivedAt": "2026-10-06T13:00:00.000Z",
+        "expiresAt": "2027-10-07T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-026",
+    "key": "mushrooms",
+    "name": "Mushrooms",
+    "category": "Produce",
+    "unit": "g",
+    "reorderPoint": 500,
+    "batchPrefix": "MU",
+    "kind": "purchased",
+    "supplier": "Green Valley Produce",
+    "packSize": 1000,
+    "packLabel": "1 kg case",
+    "deliveryDays": [
+      1,
+      3,
+      5
+    ],
+    "shelfLifeDays": 5,
+    "targetDays": 3,
+    "batches": [
+      {
+        "batchId": "MU-024",
+        "quantity": 873,
+        "arrivedAt": "2026-10-02T11:40:00.000Z",
+        "expiresAt": "2026-10-08T03:59:59.000Z"
+      },
+      {
+        "batchId": "MU-025",
+        "quantity": 1000,
+        "arrivedAt": "2026-10-07T11:40:00.000Z",
+        "expiresAt": "2026-10-13T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-027",
+    "key": "italian_bread",
+    "name": "Italian Bread",
+    "category": "Bakery",
+    "unit": "units",
+    "reorderPoint": 8,
+    "batchPrefix": "IB",
+    "kind": "purchased",
+    "supplier": "Rossi Bakery",
+    "packSize": 6,
+    "packLabel": "6 loaves",
+    "deliveryDays": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "shelfLifeDays": 3,
+    "targetDays": 1.5,
+    "batches": [
+      {
+        "batchId": "IB-060",
+        "quantity": 32,
+        "arrivedAt": "2026-10-07T10:45:00.000Z",
+        "expiresAt": "2026-10-11T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-028",
+    "key": "mascarpone",
+    "name": "Mascarpone",
+    "category": "Dairy",
+    "unit": "g",
+    "reorderPoint": 800,
+    "batchPrefix": "MS",
+    "kind": "purchased",
+    "supplier": "Bella Dairy",
+    "packSize": 1000,
+    "packLabel": "1 kg tub",
+    "deliveryDays": [
+      1,
+      5
+    ],
+    "shelfLifeDays": 14,
+    "targetDays": 5,
+    "batches": [
+      {
+        "batchId": "MS-018",
+        "quantity": 4498,
+        "arrivedAt": "2026-10-05T11:15:00.000Z",
+        "expiresAt": "2026-10-20T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-029",
+    "key": "ladyfingers",
+    "name": "Ladyfingers",
+    "category": "Dry Goods",
+    "unit": "units",
+    "reorderPoint": 60,
+    "batchPrefix": "LF",
+    "kind": "purchased",
+    "supplier": "Sysco",
+    "packSize": 240,
+    "packLabel": "240-piece case",
+    "deliveryDays": [
+      2
+    ],
+    "shelfLifeDays": 180,
+    "targetDays": 9,
+    "batches": [
+      {
+        "batchId": "LF-009",
+        "quantity": 155,
+        "arrivedAt": "2026-09-29T13:00:00.000Z",
+        "expiresAt": "2027-03-29T03:59:59.000Z"
+      },
+      {
+        "batchId": "LF-010",
+        "quantity": 720,
+        "arrivedAt": "2026-10-06T13:00:00.000Z",
+        "expiresAt": "2027-04-05T03:59:59.000Z"
+      }
+    ]
+  },
+  {
+    "id": "ING-030",
+    "key": "san_pellegrino",
+    "name": "San Pellegrino",
+    "category": "Beverages",
+    "unit": "bottles",
+    "reorderPoint": 24,
+    "batchPrefix": "SP",
+    "kind": "purchased",
+    "supplier": "Coca-Cola Bottling",
+    "packSize": 24,
+    "packLabel": "24-bottle case",
+    "deliveryDays": [
+      4
+    ],
+    "shelfLifeDays": 365,
+    "targetDays": 9,
+    "batches": [
+      {
+        "batchId": "SP-009",
+        "quantity": 33,
+        "arrivedAt": "2026-10-01T13:30:00.000Z",
+        "expiresAt": "2027-10-02T03:59:59.000Z"
+      }
+    ]
+  }
+]

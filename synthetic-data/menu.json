@@ -1,0 +1,501 @@
+[
+  {
+    "id": "MENU-001",
+    "name": "Margherita Pizza",
+    "price": 15.99,
+    "ingredients": [
+      {
+        "ingredientId": "ING-003",
+        "quantity": 1
+      },
+      {
+        "ingredientId": "ING-001",
+        "quantity": 200
+      },
+      {
+        "ingredientId": "ING-002",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-011",
+        "quantity": 5
+      },
+      {
+        "ingredientId": "ING-008",
+        "quantity": 10
+      }
+    ],
+    "key": "pizza_margherita",
+    "category": "Pizza",
+    "modifierIds": [
+      "extra_cheese",
+      "no_cheese"
+    ]
+  },
+  {
+    "id": "MENU-002",
+    "name": "Pepperoni Pizza",
+    "price": 17.99,
+    "ingredients": [
+      {
+        "ingredientId": "ING-003",
+        "quantity": 1
+      },
+      {
+        "ingredientId": "ING-001",
+        "quantity": 200
+      },
+      {
+        "ingredientId": "ING-002",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-004",
+        "quantity": 30
+      }
+    ],
+    "key": "pizza_pepperoni",
+    "category": "Pizza",
+    "modifierIds": [
+      "extra_cheese",
+      "no_cheese"
+    ]
+  },
+  {
+    "id": "MENU-003",
+    "name": "Chicken Alfredo",
+    "price": 21.99,
+    "ingredients": [
+      {
+        "ingredientId": "ING-005",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-006",
+        "quantity": 200
+      },
+      {
+        "ingredientId": "ING-009",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "ING-007",
+        "quantity": 20
+      },
+      {
+        "ingredientId": "ING-010",
+        "quantity": 5
+      }
+    ],
+    "key": "chicken_alfredo",
+    "category": "Pasta",
+    "modifierIds": []
+  },
+  {
+    "id": "MENU-004",
+    "name": "Spaghetti Marinara",
+    "price": 16.99,
+    "ingredients": [
+      {
+        "ingredientId": "ING-005",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-001",
+        "quantity": 250
+      },
+      {
+        "ingredientId": "ING-010",
+        "quantity": 6
+      },
+      {
+        "ingredientId": "ING-011",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "ING-008",
+        "quantity": 15
+      },
+      {
+        "ingredientId": "ING-007",
+        "quantity": 10
+      }
+    ],
+    "key": "spaghetti_marinara",
+    "category": "Pasta",
+    "modifierIds": [
+      "add_chicken"
+    ]
+  },
+  {
+    "id": "MENU-005",
+    "name": "Coca-Cola",
+    "price": 2.99,
+    "ingredients": [
+      {
+        "ingredientId": "ING-012",
+        "quantity": 1
+      }
+    ],
+    "key": "coca_cola",
+    "category": "Beverage",
+    "modifierIds": []
+  },
+  {
+    "id": "MENU-006",
+    "key": "lasagna",
+    "name": "Lasagna Bolognese",
+    "category": "Pasta",
+    "price": 19.99,
+    "modifierIds": [
+      "extra_cheese"
+    ],
+    "ingredients": [
+      {
+        "ingredientId": "ING-020",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "ING-016",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "ING-021",
+        "quantity": 80
+      },
+      {
+        "ingredientId": "ING-002",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "ING-001",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-007",
+        "quantity": 15
+      }
+    ]
+  },
+  {
+    "id": "MENU-007",
+    "key": "carbonara",
+    "name": "Spaghetti Carbonara",
+    "category": "Pasta",
+    "price": 18.99,
+    "modifierIds": [
+      "add_chicken"
+    ],
+    "ingredients": [
+      {
+        "ingredientId": "ING-005",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-024",
+        "quantity": 60
+      },
+      {
+        "ingredientId": "ING-017",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "ING-007",
+        "quantity": 30
+      },
+      {
+        "ingredientId": "ING-010",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "id": "MENU-008",
+    "key": "caesar_salad",
+    "name": "Caesar Salad",
+    "category": "Salad",
+    "price": 11.99,
+    "modifierIds": [
+      "add_chicken"
+    ],
+    "ingredients": [
+      {
+        "ingredientId": "ING-022",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-023",
+        "quantity": 50
+      },
+      {
+        "ingredientId": "ING-007",
+        "quantity": 15
+      },
+      {
+        "ingredientId": "ING-018",
+        "quantity": 20
+      }
+    ]
+  },
+  {
+    "id": "MENU-009",
+    "key": "spaghetti_meatballs",
+    "name": "Spaghetti & Meatballs",
+    "category": "Pasta",
+    "price": 19.49,
+    "modifierIds": [],
+    "ingredients": [
+      {
+        "ingredientId": "ING-005",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-019",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "ING-001",
+        "quantity": 200
+      },
+      {
+        "ingredientId": "ING-007",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "ING-011",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "id": "MENU-010",
+    "key": "meatball_parm",
+    "name": "Meatball Parmigiana Hero",
+    "category": "Sandwich",
+    "price": 15.49,
+    "modifierIds": [
+      "extra_cheese"
+    ],
+    "ingredients": [
+      {
+        "ingredientId": "ING-019",
+        "quantity": 4
+      },
+      {
+        "ingredientId": "ING-001",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "ING-002",
+        "quantity": 80
+      },
+      {
+        "ingredientId": "ING-027",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "MENU-011",
+    "key": "penne_vodka",
+    "name": "Penne alla Vodka",
+    "category": "Pasta",
+    "price": 18.49,
+    "modifierIds": [
+      "add_chicken"
+    ],
+    "ingredients": [
+      {
+        "ingredientId": "ING-025",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-001",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-014",
+        "quantity": 60
+      },
+      {
+        "ingredientId": "ING-007",
+        "quantity": 15
+      },
+      {
+        "ingredientId": "ING-010",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "id": "MENU-012",
+    "key": "chicken_parm",
+    "name": "Chicken Parmigiana",
+    "category": "Entree",
+    "price": 22.99,
+    "modifierIds": [
+      "extra_cheese"
+    ],
+    "ingredients": [
+      {
+        "ingredientId": "ING-009",
+        "quantity": 200
+      },
+      {
+        "ingredientId": "ING-018",
+        "quantity": 40
+      },
+      {
+        "ingredientId": "ING-017",
+        "quantity": 1
+      },
+      {
+        "ingredientId": "ING-001",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-002",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "ING-007",
+        "quantity": 15
+      },
+      {
+        "ingredientId": "ING-005",
+        "quantity": 100
+      }
+    ]
+  },
+  {
+    "id": "MENU-013",
+    "key": "pizza_funghi",
+    "name": "Funghi Pizza",
+    "category": "Pizza",
+    "price": 17.49,
+    "modifierIds": [
+      "extra_cheese",
+      "no_cheese"
+    ],
+    "ingredients": [
+      {
+        "ingredientId": "ING-003",
+        "quantity": 1
+      },
+      {
+        "ingredientId": "ING-001",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "ING-002",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "ING-026",
+        "quantity": 80
+      },
+      {
+        "ingredientId": "ING-010",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "id": "MENU-014",
+    "key": "pizza_quattro_formaggi",
+    "name": "Quattro Formaggi Pizza",
+    "category": "Pizza",
+    "price": 18.99,
+    "modifierIds": [],
+    "ingredients": [
+      {
+        "ingredientId": "ING-003",
+        "quantity": 1
+      },
+      {
+        "ingredientId": "ING-002",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "ING-007",
+        "quantity": 30
+      },
+      {
+        "ingredientId": "ING-021",
+        "quantity": 50
+      },
+      {
+        "ingredientId": "ING-008",
+        "quantity": 10
+      }
+    ]
+  },
+  {
+    "id": "MENU-015",
+    "key": "garlic_bread",
+    "name": "Garlic Bread",
+    "category": "Appetizer",
+    "price": 7.99,
+    "modifierIds": [
+      "extra_cheese"
+    ],
+    "ingredients": [
+      {
+        "ingredientId": "ING-027",
+        "quantity": 1
+      },
+      {
+        "ingredientId": "ING-015",
+        "quantity": 30
+      },
+      {
+        "ingredientId": "ING-010",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "ING-007",
+        "quantity": 10
+      }
+    ]
+  },
+  {
+    "id": "MENU-016",
+    "key": "tiramisu",
+    "name": "Tiramisu",
+    "category": "Dessert",
+    "price": 8.99,
+    "modifierIds": [],
+    "ingredients": [
+      {
+        "ingredientId": "ING-028",
+        "quantity": 90
+      },
+      {
+        "ingredientId": "ING-029",
+        "quantity": 4
+      },
+      {
+        "ingredientId": "ING-017",
+        "quantity": 1
+      },
+      {
+        "ingredientId": "ING-014",
+        "quantity": 20
+      }
+    ]
+  },
+  {
+    "id": "MENU-017",
+    "key": "san_pellegrino",
+    "name": "San Pellegrino",
+    "category": "Beverage",
+    "price": 3.49,
+    "modifierIds": [],
+    "ingredients": [
+      {
+        "ingredientId": "ING-030",
+        "quantity": 1
+      }
+    ]
+  }
+]

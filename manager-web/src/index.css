@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Glassmorphism theme — warm faded backdrop (light red / coral / amber) with
+   large soft blurred colour blobs so the frosted panels have something to
+   refract. Panels use backdrop-blur + a semi-transparent tint + a thin rim
+   light, per glassmorphism best practice (blur 10–30px, 10–30% tint for text
+   legibility, consistent light direction, dark-mode variant).
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* base palette (kept for charts/text/semantics) */
+  --bg: 255 247 243;        /* warm off-white */
+  --surface: 255 255 255;
+  --surface-2: 252 243 240;
+  --border: 232 220 216;
+  --text: 40 28 28;
+  --muted: 120 102 102;
+  --brand: 225 90 70;       /* warm coral-red brand */
+  --brand-fg: 255 255 255;
+  --ok: 22 163 74;
+  --warn: 202 138 4;
+  --danger: 220 38 38;
+
+  /* glass tokens */
+  --glass-bg: 255 255 255;      /* tint colour */
+  --glass-alpha: 0.55;          /* tint opacity (semi-opaque for legibility) */
+  --glass-border: 255 255 255;  /* rim light colour */
+  --glass-border-alpha: 0.6;
+  --glass-blur: 18px;
+
+  /* faded background blobs */
+  --blob-1: 255 138 128;   /* light red */
+  --blob-2: 255 183 122;   /* warm amber */
+  --blob-3: 255 170 190;   /* soft pink */
+  --blob-4: 255 214 165;   /* peach */
+}
+
+.dark {
+  --bg: 24 14 16;          /* deep warm near-black */
+  --surface: 36 24 27;
+  --surface-2: 46 31 35;
+  --border: 70 50 55;
+  --text: 245 232 230;
+  --muted: 190 165 165;
+  --brand: 240 110 95;
+  --brand-fg: 28 16 18;
+  --ok: 52 211 153;
+  --warn: 234 179 8;
+  --danger: 248 113 113;
+
+  --glass-bg: 40 26 30;
+  --glass-alpha: 0.45;
+  --glass-border: 255 255 255;
+  --glass-border-alpha: 0.14;
+  --glass-blur: 20px;
+
+  --blob-1: 190 70 70;
+  --blob-2: 150 80 50;
+  --blob-3: 150 60 90;
+  --blob-4: 120 70 50;
+}
+
+* { border-color: rgb(var(--border)); }
+
+html, body, #root { height: 100%; }
+
+body {
+  color: rgb(var(--text));
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  background: rgb(var(--bg));
+  overflow-x: hidden;
+}
+
+/* Faded colour backdrop: a soft gradient wash + large blurred blobs. Fixed so
+   it stays put while content scrolls, giving the glass panels real depth. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(42rem 42rem at 12% 8%,  rgb(var(--blob-1) / 0.55), transparent 60%),
+    radial-gradient(38rem 38rem at 88% 12%, rgb(var(--blob-2) / 0.50), transparent 60%),
+    radial-gradient(44rem 44rem at 78% 88%, rgb(var(--blob-3) / 0.48), transparent 62%),
+    radial-gradient(36rem 36rem at 18% 82%, rgb(var(--blob-4) / 0.45), transparent 60%),
+    linear-gradient(135deg, rgb(var(--bg)), rgb(var(--surface-2)));
+  background-attachment: fixed;
+}
+
+/* a very light noise/vignette layer keeps large flat areas from banding */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 120% at 50% 0%, transparent 60%, rgb(0 0 0 / 0.06));
+  pointer-events: none;
+}
+
+/* ── Reusable glass surface ─────────────────────────────────────────────── */
+.glass {
+  background: rgb(var(--glass-bg) / var(--glass-alpha));
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border: 1px solid rgb(var(--glass-border) / var(--glass-border-alpha));
+  box-shadow:
+    0 8px 32px rgb(0 0 0 / 0.12),
+    inset 0 1px 0 rgb(255 255 255 / 0.25); /* top rim light (consistent light from top) */
+}
+.glass-strong {
+  --glass-alpha: 0.72;
+}
+/* Lighter translucent fill for tiles nested INSIDE a glass panel. */
+.glass-inset {
+  background: rgb(var(--glass-bg) / 0.32);
+  border: 1px solid rgb(var(--glass-border) / calc(var(--glass-border-alpha) * 0.5));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Shimmer skeleton (tuned to glass) */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgb(var(--glass-bg) / 0.35);
+  border-radius: 10px;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.3), transparent);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { 100% { transform: translateX(100%); } }

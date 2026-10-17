@@ -1,0 +1,25 @@
+# Local Postgres for the prototype. Run from the project root:
+#   docker compose up -d
+# Then set backend/.env DATABASE_URL to:
+#   postgresql://postgres:postgres@localhost:5432/barmade
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: barmade-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: barmade
+    ports:
+      - '5432:5432'
+    volumes:
+      - barmade_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  barmade_pgdata:

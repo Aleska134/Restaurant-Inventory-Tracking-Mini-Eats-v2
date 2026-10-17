@@ -1,0 +1,49 @@
+{
+  "exportedAt": "2026-10-07T20:17:59.482Z",
+  "synthetic": true,
+  "generator": "BarMade deterministic demo generator",
+  "seed": 20261007,
+  "days": 60,
+  "timezone": "America/New_York",
+  "start_date": "2026-08-09",
+  "end_date": "2026-10-07",
+  "now": "2026-10-07T22:30:00.000Z",
+  "now_local": "2026-10-07 18:30",
+  "emergency_purchases": 0,
+  "stories": {
+    "low_stock": {
+      "ingredient_id": "ING-002",
+      "ingredient": "Mozzarella Cheese",
+      "short_shipped_on": "2026-10-07",
+      "cases_missing": 13,
+      "minimum_stock": 8000,
+      "current_stock": 9381,
+      "unit": "g"
+    },
+    "overstock": {
+      "ingredient_id": "ING-001",
+      "ingredient": "Tomato Sauce",
+      "bulk_delivery_on": "2026-10-06",
+      "extra_packs": 24
+    },
+    "sales_spike": {
+      "date": "2026-09-19",
+      "orders": 239,
+      "note": "Little Italy street festival"
+    },
+    "channel_fees": {
+      "note": "Uber Eats / DoorDash: large gross, 25-30% commission"
+    },
+    "best_seller": {
+      "item_id": "pizza_margherita",
+      "name": "Margherita Pizza"
+    }
+  },
+  "counts": {
+    "inventory": 30,
+    "menu": 17,
+    "orders": 7319,
+    "movements": 71569,
+    "alerts": 14
+  }
+}
