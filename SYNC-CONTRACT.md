@@ -58,3 +58,19 @@ Each change appends `{status, at}` to `statusHistory` and sets `updatedAt`.
 ## Connection
 Customer app sets `BARMADE_API_URL` = this backend's public URL.
 Manager app sets `VITE_API_URL` = the same URL. See `DEPLOY-RAILWAY.md`.
+
+## Authentication (manager login)
+
+When the backend has `MANAGER_PASSWORD` set, every route needs a manager token **except** these public ones:
+
+| Public route | Who uses it |
+|---|---|
+| `GET /api/health`, `GET /api/auth/config`, `POST /api/auth/login` | health checks, the dashboard's login |
+| `GET /api/menu`, `GET /api/inventory`, `GET /api/status` | customer app |
+| `POST /api/orders`, `POST /api/orders/precheck`, `GET /api/orders/:id` | customer app |
+
+Manager routes (including `PATCH /api/orders/:id/status` and `GET /api/orders`) need
+`Authorization: Bearer <token>`, where the token comes from `POST /api/auth/login` with
+`{ "email", "password" }` (valid 7 days). Without `MANAGER_PASSWORD`, login is off and every route is open.
+Implementation: `backend/src/lib/auth.ts`.
+

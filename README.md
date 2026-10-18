@@ -66,6 +66,9 @@ of history. The app is in English, with a full Spanish toggle on the customer si
 - **Sales:** by day, by dish and by channel (BarMade vs. Uber Eats / DoorDash fees).
 - **Close / Open day:** a readiness check, then an end-of-day summary written by an LLM from computed facts.
 - **Simulate rush** for live demos.
+- **Manager login:** one manager account set with `MANAGER_EMAIL` / `MANAGER_PASSWORD` on the backend. Every
+  manager route needs the login; the routes the customer app uses stay public. See
+  [`backend/src/lib/auth.ts`](backend/src/lib/auth.ts).
 
 ### Design rule (from the PRD)
 
@@ -82,7 +85,8 @@ You need **Node 20** (`nvm use 20`) and a PostgreSQL URL (a free [Neon](https://
 ```bash
 # 1) Backend: http://localhost:4000
 cd backend
-cp .env.example .env          # set DATABASE_URL (+ OPENROUTER_API_KEY for the Close-Day summary)
+cp .env.example .env          # set DATABASE_URL (+ OPENROUTER_API_KEY for the Close-Day summary,
+                              #  MANAGER_EMAIL / MANAGER_PASSWORD to require the dashboard login)
 npm install
 npx prisma db push            # create the tables
 npm run seed                  # load the synthetic dataset (idempotent)
@@ -122,7 +126,10 @@ The customer app calls the backend **from its server** (never from the browser):
 | `POST /api/orders/precheck` | Dry-run stock check before confirming |
 | `POST /api/orders` | Place an order (`channel: "barmade"`, `source: "barmade-web"`, to go / for here, table, name) |
 | `GET /api/orders/:id` | Order status for live tracking |
-| `PATCH /api/orders/:id/status` | Used by the manager dashboard to move the order forward |
+| `PATCH /api/orders/:id/status` | Used by the manager dashboard to move the order forward (manager login) |
+
+Those customer-facing calls are public. Every other route (inventory changes, alerts, cart, vendors, orders
+list, close/open day…) belongs to the manager and needs the login token (`Authorization: Bearer …`).
 
 The full contract is in [`SYNC-CONTRACT.md`](SYNC-CONTRACT.md); the first version is in
 [`docs/handoff/orders-contract.md`](docs/handoff/orders-contract.md).

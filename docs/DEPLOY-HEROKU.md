@@ -95,6 +95,8 @@ heroku config:set -a barmade-backend \
   OPENROUTER_API_KEY='sk-or-...' \
   OPENROUTER_MODEL='nvidia/nemotron-nano-9b-v2:free' \
   OPENROUTER_FALLBACK_MODELS='meta-llama/llama-3.3-70b-instruct:free,deepseek/deepseek-chat-v3-0324:free' \
+  MANAGER_EMAIL='you@example.com' \
+  MANAGER_PASSWORD='pick-a-long-password' \
   CORS_ORIGINS='https://barmade-manager-xxxx.herokuapp.com'   # fill in after step 4
 
 git push https://git.heroku.com/barmade-backend.git main:main
@@ -106,6 +108,10 @@ git push https://git.heroku.com/barmade-backend.git main:main
   syncs the schema (`prisma db push`) and **seeds the synthetic data only if the database is empty**, so it never
   wipes data on later deploys.
 - `PORT` is set by Heroku; don't set it yourself.
+- **Manager login:** `MANAGER_EMAIL` + `MANAGER_PASSWORD` are the dashboard's login. To change the password, just
+  change the config var (`heroku config:set -a barmade-backend MANAGER_PASSWORD='new-one'`): the app restarts and
+  everyone has to log in again. If you leave `MANAGER_PASSWORD` empty, login is **off** and anyone with the
+  dashboard link can manage the restaurant, so only do that locally.
 
 Check it:
 
@@ -245,6 +251,7 @@ If you keep using them, update these too:
 |---|---|---|
 | `ios/project.yml`, `ios/MiniEats.xcodeproj` (`BARMADE_API_URL`) | Ricardo's Railway backend | your Heroku backend URL |
 | `.claude/skills/connectivity/scripts/check.sh` (`BARMADE`) | Ricardo's Railway backend | your Heroku backend URL |
+| iOS merchant app (status buttons, orders list) | manager routes | with login on, these need the manager token: add a login screen to the app, or keep it on a backend without `MANAGER_PASSWORD` |
 | `web/` (old Python demo, `BARMADE_URL`) | Alon's Render API | your Heroku backend URL (optional) |
 
 ---
@@ -257,6 +264,8 @@ If you keep using them, update these too:
 | Manager page is blank / `vite: not found` in logs | Same, on the manager app |
 | Manager shows network / CORS errors | Backend `CORS_ORIGINS` doesn't include the manager URL exactly (scheme + host, no trailing slash) |
 | Customer `/api/health` says `"db":"embedded"` | `FIREBASE_SERVICE_ACCOUNT` missing or not valid base64 |
+| Dashboard keeps showing the login screen / "Wrong email or password" | Check `MANAGER_EMAIL` / `MANAGER_PASSWORD` on the **backend** app (`heroku config -a barmade-backend`); after 5 wrong tries, wait a minute |
+| Dashboard shows "Manager login is off" | `MANAGER_PASSWORD` isn't set on the backend → set it |
 | Customer menu shows everything sold out | `BARMADE_API_URL` wrong, or the backend is asleep or failing → check `/api/menu` on the backend |
 | Mic says "the voice assistant isn't available" | No AI key, out of credit, or `AI_PROVIDER` points at a provider without a key |
 | Mic button missing | `NEXT_PUBLIC_VOICE_ORDERING=on` was set after the build → redeploy |
