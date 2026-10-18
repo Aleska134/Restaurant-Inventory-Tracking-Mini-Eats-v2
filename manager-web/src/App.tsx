@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  LayoutDashboard, Boxes, LineChart, Bell, Sparkles, Moon, Sun, Zap, UtensilsCrossed, CalendarRange, ShoppingCart, Store, ClipboardList,
+  LayoutDashboard, Boxes, LineChart, Bell, Sparkles, Moon, Sun, Zap, UtensilsCrossed, CalendarRange, ShoppingCart, Store, ClipboardList, LogOut,
 } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
 import { AllTime } from './pages/AllTime';
@@ -14,6 +14,7 @@ import { Orders } from './pages/Orders';
 import { CloseDay } from './pages/CloseDay';
 import { Button } from './components/ui';
 import { api } from './lib/api';
+import { getToken, logout } from './lib/auth';
 
 type Tab = 'dashboard' | 'alltime' | 'inventory' | 'sales' | 'alerts' | 'cart' | 'vendors' | 'orders' | 'closeday';
 
@@ -132,6 +133,15 @@ export default function App() {
             {dark ? <Sun size={18} /> : <Moon size={18} />}
             {dark ? 'Light mode' : 'Dark mode'}
           </button>
+          {getToken() && (
+            <button
+              onClick={logout}
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted hover:bg-surface-2 hover:text-text"
+            >
+              <LogOut size={18} />
+              Log out
+            </button>
+          )}
         </div>
       </aside>
 
@@ -150,6 +160,11 @@ export default function App() {
             <Button onClick={() => setTab('closeday')} variant={dayClosed ? 'ghost' : 'primary'}>
               <Sparkles size={16} /> {dayClosed === null ? 'Day' : dayClosed ? 'Closed — open day' : 'Open — close day'}
             </Button>
+            {getToken() && (
+              <Button variant="ghost" onClick={logout} className="md:hidden">
+                <LogOut size={16} />
+              </Button>
+            )}
           </div>
         </header>
 

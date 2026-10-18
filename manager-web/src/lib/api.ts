@@ -1,12 +1,20 @@
 import { useEffect, useState, useCallback } from 'react';
+import { getToken, logout } from './auth';
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getToken();
   const res = await fetch(`${BASE}/api${path}`, {
-    headers: { 'Content-Type': 'application/json' },
     ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(init?.headers ?? {}),
+    },
   });
+  // Session expired or password changed: back to the login screen.
+  if (res.status === 401 && !path.startsWith('/auth/')) logout();
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error((body as any).error ?? `HTTP ${res.status}`);
