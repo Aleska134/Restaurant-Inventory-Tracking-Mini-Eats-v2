@@ -7,6 +7,7 @@ loadEnv({ path: resolve(dirname(fileURLToPath(import.meta.url)), '..', '.env') }
 import express from 'express';
 import cors from 'cors';
 import { api } from './routes/api.js';
+import { authRoutes, authEnabled, requireManager } from './lib/auth.js';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -16,7 +17,11 @@ const origins = (process.env.CORS_ORIGINS ?? 'http://localhost:5173')
   .map((o) => o.trim());
 app.use(cors({ origin: origins }));
 
+// Manager login (see lib/auth.ts): public customer routes stay open, everything else needs a token.
+app.use('/api', authRoutes);
+app.use('/api', requireManager);
 app.use('/api', api);
+if (!authEnabled()) console.warn('[barmade] MANAGER_PASSWORD is not set: manager login is OFF (anyone can use the dashboard).');
 app.get('/', (_req, res) => res.json({ service: 'barmade-backend', ok: true }));
 
 const port = Number(process.env.PORT ?? 4000);
