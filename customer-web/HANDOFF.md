@@ -114,7 +114,12 @@ nvm use               # Node 20
 npm install
 cp .env.example .env  # then fill in the variables above
 npm run dev           # http://localhost:3000
+npm test              # unit tests (Vitest): voice ordering, group bill, suggestions, avoid list
 ```
+
+The tests in `tests/` need no network, database or AI key: the model is replaced by a stub, so they check what the
+code does with its answer (only real, in-stock dishes reach the cart; a built meal respects the budget and what the
+customer avoids; a group bill split equally adds up to the exact cent). CI runs them on every pull request.
 
 With no `BARMADE_API_URL` and no Firebase variables, the app runs fully offline: it uses the synthetic dataset, an
 embedded database in `customer-web/.pglite/` (delete that folder to reset) and keeps group orders in memory. That's
